@@ -6,24 +6,29 @@ int activeInput = -1;
 
 void updateInputs() {
   
-  // Update Scrolls and Drag
+  // Update All Scroll and Drag Inputs
   if (!mousePressed) {
-    drag.update();
-    camOffset.x = drag.getX();
-    camOffset.y = drag.getY();
+    if (drag.updating()) {
+      drag.update();
+      camOffset.x = drag.getX();
+      camOffset.y = drag.getY();
+    }
     hs.update();
     camRotation = hs.getPosPI();
     vs.update();
     camZoom = vs.getPosZoom();
+    
   // Update Drag Only
   } else if (activeInput == 0) {
     drag.update();
     camOffset.x = drag.getX();
     camOffset.y = drag.getY();
+    
   // Update Horizontal Scroll Bar Only
   } else if (activeInput == 1) {
     hs.update();
     camRotation = hs.getPosPI();
+    
   // Update Vertical Scroll Bar Only
   } else if (activeInput == 2) {
     vs.update();
@@ -265,6 +270,14 @@ class XYDrag {
     y = scaler*y_smooth;
   }
   
+  boolean updating() {
+    if (abs(x_smooth - x_offset) > 1 || abs(y_smooth - y_offset) > 1) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
   // Coordinate Rotation Transformation:
   // x' =   x*cos(theta) + y*sin(theta)
   // y' = - x*sin(theta) + y*cos(theta)
@@ -280,8 +293,6 @@ class XYDrag {
 
 void mousePressed() {
   
-  println(camOffset.x, camOffset.y, drag.x, drag.y);
-  
   // Determine which output is active
   if (hs.overEvent()) {
     activeInput = 1;
@@ -293,8 +304,6 @@ void mousePressed() {
   } else {
     activeInput = -1;
   }
-  
-  println("pressed: " + activeInput);
 }
 
 void keyPressed() {
@@ -305,6 +314,7 @@ void keyPressed() {
   }
 }
 
+// resets and centers camera view
 void resetControls() {
   hs.newspos = hs.swidth/2;
   vs.newspos = vs.sheight/2;

@@ -21,7 +21,7 @@ class Field {
     popMatrix();
     
     //Draw Some Grass
-    fill(grassColor, 2*baseAlpha);
+    fill(grassColor, 255 - baseAlpha);
     noStroke();
     rect(20, 20, boundary.x - 40, boundary.y - 40);
   }

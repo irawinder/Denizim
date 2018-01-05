@@ -1,10 +1,14 @@
+// Global Constants and Configuration for Application
+
+float MARGIN = 0.03;
+
 // Default color for lines, text, etc
 int lnColor = 255;  // (0-255)
 // Default background color
 int bgColor = 0;    // (0-255)
 // Default baseline alpha value
 int baseAlpha = 50; // (0-255)
-
+// Default Grass Color
 int grassColor = #95AA13;
 
 void invertColors() {

@@ -1,4 +1,4 @@
-/*  Copyright 2018 Ira Winder
+/*  Copyright 2018 Ira Winder and Changing Environments
  *
  *  Permission is hereby granted, free of charge, to
  *  any person obtaining a copy of this software *

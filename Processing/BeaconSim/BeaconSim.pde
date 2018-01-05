@@ -1,10 +1,14 @@
-/*  Beacon Simulator, Ira Winder 2018
+/*  Beacon Simulator, Ira Winder and Changing Environments, 2018
  *
  *  Beacon Simulator simulates and visualizes wireless 
- *  sensors placed in an urban environment. Sensors detect 
- *  synthetic people that ambulate through an environment.
+ *  sensors. Sensors detect synthetic people that ambulate 
+ *  through an urban environment.
  *
  */
+
+String description = "Simulates and visualizes wireless " +
+                     "sensors. Sensors detect synthetic people that " +
+                     "ambulate through an urban environment.";
 
 // Class that contains our urban sensor simulation
 Field city;
@@ -31,17 +35,15 @@ void setup() {
   // Initialize the environment
   city = new Field(400, 400, 50);
   
-  float margin = 0.05;
-  
   // Initialize Horizontal Scrollbar
-  hs = new HScrollbar(int(margin*width), int((1-2*margin)*height), int((1-2*margin)*width), int(margin*height), 5);
+  hs = new HScrollbar(int(MARGIN*width), int((1-2*MARGIN)*height), int((1-2*MARGIN)*width), int(MARGIN*height), 5);
   camRotation = hs.getPosPI(); // (0 - 2*PI)
   
   // Initialize Vertical Scrollbar
-  vs = new VScrollbar(width - int(2*margin*height), int(margin*height), int(margin*height), int(0.3*height), 5);
+  vs = new VScrollbar(width - int(2*MARGIN*height), int(MARGIN*height), int(MARGIN*height), int(0.3*height), 5);
   
   // Initialize Drag Funciton
-  drag = new XYDrag(1.0, 16, 5, 5, width - 10, int(0.85*height) - 5);
+  drag = new XYDrag(1.0, 7, 5, 5, width - 10, int(0.85*height) - 5);
   
 }
 
@@ -71,6 +73,25 @@ void draw2D() {
   hs.display();
   vs.display();
   
+  // Draw Help Text
+  pushMatrix();
+  translate(width/2, MARGIN*height);
+  fill(lnColor, 255-baseAlpha);
+  textAlign(CENTER, TOP);
+  text("Press 'r' to reset camera position", 0, 0);
+  popMatrix();
+  
+  // Draw Description
+  pushMatrix();
+  translate(MARGIN*height, MARGIN*height);
+  fill(lnColor, 255-baseAlpha);
+  textAlign(LEFT, TOP);
+  text("Beacon Simulator\n\n" + 
+       "Ira Winder\nChanging Environments\n\n" +
+       description,
+       0, 0, 200, 0.9*height);
+  popMatrix();
+  
   hint(ENABLE_DEPTH_TEST);
 }
 
@@ -87,6 +108,7 @@ void draw3D() {
   // Translate Reference Frame
   translate(camOffset.x, camOffset.y, 0);
   
+  // Draw 3D Objects
   city.render();
   
   popMatrix();
