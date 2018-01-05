@@ -28,7 +28,7 @@ void setCamera(PVector boundary) {
   
   // Camera Position
   eyeX = boundary.x * +0.5;
-  eyeY = camZoom * boundary.y * -0.5;
+  eyeY = boundary.y * -0.5;
   eyeZ = camZoom * boundary.z * +10.0;
   
   // Point of Camera Focus
