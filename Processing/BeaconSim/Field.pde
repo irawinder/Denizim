@@ -14,13 +14,16 @@ class Field {
     
     //Draw Bounding Box
     stroke(lnColor);
-    fill(lnColor, baseAlpha);
+    noFill();
     pushMatrix();
     translate(0.5*boundary.x, 0.5*boundary.y, 0.5*boundary.z);
     box(boundary.x, boundary.y, boundary.z);
     popMatrix();
-    fill(lnColor);
-    ellipse(0, 0, 20, 20);
+    
+    //Draw Some Grass
+    fill(grassColor, 2*baseAlpha);
+    noStroke();
+    rect(20, 20, boundary.x - 40, boundary.y - 40);
   }
 }
 

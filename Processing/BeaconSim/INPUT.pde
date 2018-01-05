@@ -1,20 +1,33 @@
 //  Input -1 = none
 //  Input  0 = drag
 //  Input  1 = horizontal scroll bar
+//  Input  2 = vertical scroll bar
 int activeInput = -1;
 
 void updateInputs() {
-  // Update Drag
-  if (activeInput == 0) {
+  
+  // Update Scrolls and Drag
+  if (!mousePressed) {
     drag.update();
-    if (mousePressed) {
-      camOffset.x = drag.getX();
-      camOffset.y = drag.getY();
-    }
-  // Update Scroll Bar
+    camOffset.x = drag.getX();
+    camOffset.y = drag.getY();
+    hs.update();
+    camRotation = hs.getPosPI();
+    vs.update();
+    camZoom = vs.getPosZoom();
+  // Update Drag Only
+  } else if (activeInput == 0) {
+    drag.update();
+    camOffset.x = drag.getX();
+    camOffset.y = drag.getY();
+  // Update Horizontal Scroll Bar Only
   } else if (activeInput == 1) {
     hs.update();
     camRotation = hs.getPosPI();
+  // Update Vertical Scroll Bar Only
+  } else if (activeInput == 2) {
+    vs.update();
+    camZoom = vs.getPosZoom();
   }
 }
 
@@ -35,7 +48,7 @@ class HScrollbar {
     ratio = (float)sw / (float)widthtoheight;
     xpos = xp;
     ypos = yp-sheight/2;
-    spos = xpos + swidth/2 - sheight/2;
+    spos = swidth/2;
     newspos = spos;
     sposMin = xpos;
     sposMax = xpos + swidth - sheight;
@@ -77,14 +90,14 @@ class HScrollbar {
 
   void display() {
     noStroke();
-    fill(204);
-    rect(xpos, ypos, swidth, sheight);
+    fill(204, baseAlpha);
+    rect(xpos, ypos, swidth, sheight, sheight);
     if (over || locked) {
-      fill(0, 0, 0);
+      fill(lnColor, baseAlpha);
     } else {
-      fill(102, 102, 102);
+      fill(102, 102, 102, baseAlpha);
     }
-    rect(spos, ypos, sheight, sheight);
+    ellipse(spos + sheight/2, ypos + sheight/2, sheight, sheight);
   }
 
   float getPos() {
@@ -100,14 +113,106 @@ class HScrollbar {
   }
 }
 
+class VScrollbar {
+  int swidth, sheight;    // width and height of bar
+  float xpos, ypos;       // x and y position of bar
+  float spos, newspos;    // y position of slider
+  float sposMin, sposMax; // max and min values of slider
+  int loose;              // how loose/heavy
+  boolean over;           // is the mouse over the slider?
+  boolean locked;
+  float ratio;
+
+  VScrollbar (float xp, float yp, int sw, int sh, int l) {
+    swidth = sw;
+    sheight = sh;
+    int heighttowidth = sw - sh;
+    ratio = (float)sh / (float)heighttowidth;
+    xpos = xp-swidth/2;
+    ypos = yp;
+    spos = sheight/2;
+    newspos = spos;
+    sposMin = ypos;
+    sposMax = ypos + sheight - swidth;
+    loose = l;
+  }
+
+  void update() {
+    if (overEvent()) {
+      over = true;
+    } else {
+      over = false;
+    }
+    if (mousePressed && over) {
+      locked = true;
+    }
+    if (!mousePressed) {
+      locked = false;
+    }
+    if (locked) {
+      newspos = constrain(mouseY-swidth/2, sposMin, sposMax);
+    }
+    if (abs(newspos - spos) > 1) {
+      spos = spos + (newspos-spos)/loose;
+    }
+  }
+
+  float constrain(float val, float minv, float maxv) {
+    return min(max(val, minv), maxv);
+  }
+
+  boolean overEvent() {
+    if (mouseX > xpos && mouseX < xpos+swidth &&
+       mouseY > ypos && mouseY < ypos+sheight) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  void display() {
+    noStroke();
+    fill(204, baseAlpha);
+    rect(xpos, ypos, swidth, sheight, swidth);
+    if (over || locked) {
+      fill(lnColor, baseAlpha);
+    } else {
+      fill(102, 102, 102, baseAlpha);
+    }
+    ellipse(xpos + swidth/2, spos + swidth/2, swidth, swidth);
+  }
+
+  float getPos() {
+    // Convert spos to be values between
+    // 0 and the total width of the scrollbar
+    return spos * ratio;
+  }
+  
+  float getPosPI() {
+    // Convert spos to be values between
+    // 0 and 2PI
+    return 2 * PI * spos / float(sheight);
+  }
+  
+  float getPosZoom() {
+    // Convert spos to be values between
+    // 0 and 2PI
+    return MIN_ZOOM + (MAX_ZOOM - MIN_ZOOM) * spos / float(sheight);
+  }
+}
+
 class XYDrag {
   float scaler;
-  int loose;
+  float loose;
   
-  int x_init;
-  int y_init;
-  int x_offset;
-  int y_offset;
+  float x_init;
+  float y_init;
+  float x_offset;
+  float y_offset;
+  float x_smooth;
+  float y_smooth;
+  
+  float x, y;
   
   float camX_init;
   float camY_init;
@@ -118,7 +223,7 @@ class XYDrag {
   int extentW;
   int extentH;
   
-  XYDrag(float s, int l, int eX, int eY, int eW, int eH ) {
+  XYDrag(float s, float l, int eX, int eY, int eW, int eH ) {
     scaler = s;
     loose = l;
     
@@ -141,36 +246,70 @@ class XYDrag {
     y_init = mouseY;
     camX_init = camOffset.x;
     camY_init = camOffset.y;
+    x_smooth = 0;
+    y_smooth = 0;
   }
   
   void update() {
-    x_offset = mouseX - x_init;
-    y_offset = mouseY - y_init;
+    if (mousePressed) {
+      x_offset = - (mouseX - x_init);
+      y_offset = - (mouseY - y_init);
+    }
+    if (abs(x_smooth - x_offset) > 1) {
+      x_smooth = x_smooth + (x_offset-x_smooth)/loose;
+    }
+    if (abs(y_smooth - y_offset) > 1) {
+      y_smooth = y_smooth + (y_offset-y_smooth)/loose;
+    }
+    x = scaler*x_smooth;
+    y = scaler*y_smooth;
   }
   
+  // Coordinate Rotation Transformation:
+  // x' =   x*cos(theta) + y*sin(theta)
+  // y' = - x*sin(theta) + y*cos(theta)
+  
   float getX() {
-    return camX_init + scaler*x_offset;
+    return camX_init + x*cos(camRotation) + y*sin(camRotation);
   }
   
   float getY() {
-    return camY_init + scaler*y_offset;
+    return camY_init - x*sin(camRotation) + y*cos(camRotation);
   }
 }
 
 void mousePressed() {
   
+  println(camOffset.x, camOffset.y, drag.x, drag.y);
+  
   // Determine which output is active
-  if (drag.inExtents()) {
-    activeInput = 0;
-  } else if (hs.overEvent()) {
+  if (hs.overEvent()) {
     activeInput = 1;
+  } else if (vs.overEvent()) {
+    activeInput = 2;
+  } else if (drag.inExtents()) {
+    activeInput = 0;
+    drag.init();
   } else {
     activeInput = -1;
   }
   
-  if (activeInput == 0) drag.init();
+  println("pressed: " + activeInput);
 }
 
-void mouseReleased() {
-  activeInput = -1;
+void keyPressed() {
+  switch(key) {
+    case 'r':
+      resetControls();
+      break;
+  }
+}
+
+void resetControls() {
+  hs.newspos = hs.swidth/2;
+  vs.newspos = vs.sheight/2;
+  drag.x_offset = 0;
+  drag.y_offset = 0;
+  drag.camX_init = 0;
+  drag.camY_init = 0;
 }

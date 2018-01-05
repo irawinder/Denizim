@@ -5,28 +5,32 @@ int bgColor = 0;    // (0-255)
 // Default baseline alpha value
 int baseAlpha = 50; // (0-255)
 
+int grassColor = #95AA13;
+
 void invertColors() {
   lnColor = bgColor;
   bgColor = abs(lnColor - 255);
 }
 
 float camRotation = 0; // (0 - 2*PI)
+float MAX_ZOOM = 0.1;
+float MIN_ZOOM = 1.1;
+float camZoom = 0.6;
 PVector camOffset = new PVector(0,0);
 
 // Set Camera Position
 void setCamera(PVector boundary) {
   float eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ;
-  float zoom = 0.6;
   
   // Camera Position
   eyeX = boundary.x * +0.5;
-  eyeY = zoom * boundary.y * -0.5;
-  eyeZ = zoom * boundary.z * +10.0;
+  eyeY = camZoom * boundary.y * -0.5;
+  eyeZ = camZoom * boundary.z * +10.0;
   
   // Point of Camera Focus
   centerX = 0.50 * boundary.x;
   centerY = 0.50 * boundary.y;
-  centerZ = 0.50 * boundary.z;
+  centerZ = -1.0 * boundary.z;
   
   // Axes Directionality (Do not change)
   upX =   0;

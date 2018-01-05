@@ -9,8 +9,9 @@
 // Class that contains our urban sensor simulation
 Field city;
 
-// Scrollbar
+// Scrollbars (horizontal and vertical
 HScrollbar hs;
+VScrollbar vs;
 
 // Drag Functions
 XYDrag drag;
@@ -30,11 +31,17 @@ void setup() {
   // Initialize the environment
   city = new Field(400, 400, 50);
   
-  // Initialize scrollbar
-  hs = new HScrollbar(0, 0.975*height, width, int(0.05*height), 5);
+  float margin = 0.05;
+  
+  // Initialize Horizontal Scrollbar
+  hs = new HScrollbar(int(margin*width), int((1-2*margin)*height), int((1-2*margin)*width), int(margin*height), 5);
+  camRotation = hs.getPosPI(); // (0 - 2*PI)
+  
+  // Initialize Vertical Scrollbar
+  vs = new VScrollbar(width - int(2*margin*height), int(margin*height), int(margin*height), int(0.3*height), 5);
   
   // Initialize Drag Funciton
-  drag = new XYDrag(1.0, 5, 5, 5, width - 10, int(0.9*height) - 5);
+  drag = new XYDrag(1.0, 16, 5, 5, width - 10, int(0.85*height) - 5);
   
 }
 
@@ -60,8 +67,9 @@ void draw2D() {
   perspective();
   hint(DISABLE_DEPTH_TEST);
   
-  // Draw Scroll Bar
+  // Draw Scroll Bars
   hs.display();
+  vs.display();
   
   hint(ENABLE_DEPTH_TEST);
 }
