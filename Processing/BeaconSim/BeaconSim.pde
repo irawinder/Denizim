@@ -6,6 +6,8 @@
  *
  */
 
+String project = "Beacon Simulator\n\n" + "Ira Winder\nChanging Environments\n\n";
+
 String description = "Simulates and visualizes wireless " +
                      "sensors. Sensors detect synthetic people that " +
                      "ambulate through an urban environment.";
@@ -32,8 +34,11 @@ void setup() {
   fullScreen(P3D);
   */
   
+  // Sets Color Mode to Hue, Saturation, and Brightness
+  colorMode(HSB);
+  
   // Initialize the environment
-  city = new Field(400, 400, 50);
+  city = new Field(800, 800, 50);
   
   // Initialize Horizontal Scrollbar
   hs = new HScrollbar(int(MARGIN*width), int((1-2*MARGIN)*height), int((1-2*MARGIN)*width), int(MARGIN*height), 5);
@@ -53,6 +58,11 @@ void draw() {
   
   // Update mouse and keyboard inputs
   updateInputs();
+  
+  // Update Simulation Aspects
+  for (Person p: city.people) {
+    p.update();
+  }
   
   // Draw 3D Graphics
   draw3D();
@@ -86,10 +96,7 @@ void draw2D() {
   translate(MARGIN*height, MARGIN*height);
   fill(lnColor, 255-baseAlpha);
   textAlign(LEFT, TOP);
-  text("Beacon Simulator\n\n" + 
-       "Ira Winder\nChanging Environments\n\n" +
-       description,
-       0, 0, 200, 0.9*height);
+  text(project + description, 0, 0, 200, 0.9*height);
   popMatrix();
   
   hint(ENABLE_DEPTH_TEST);

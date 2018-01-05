@@ -18,7 +18,7 @@ void invertColors() {
 
 float camRotation = 0; // (0 - 2*PI)
 float MAX_ZOOM = 0.1;
-float MIN_ZOOM = 1.1;
+float MIN_ZOOM = 1.6;
 float camZoom = 0.6;
 PVector camOffset = new PVector(0,0);
 

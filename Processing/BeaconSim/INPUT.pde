@@ -311,6 +311,12 @@ void keyPressed() {
     case 'r':
       resetControls();
       break;
+    case 'b':
+      city.randomizeBlocks();
+      break;
+    case 'p':
+      city.randomizePeople();
+      break;
   }
 }
 
