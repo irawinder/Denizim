@@ -49,7 +49,7 @@ class Field {
   void render() {
     
     // Draw Bounding Box
-    stroke(lnColor, 0.5*baseAlpha);
+    stroke(lnColor, 0.5*baseAlpha*uiFade);
     noFill();
     pushMatrix();
     translate(0.5*boundary.x, 0.5*boundary.y, 0.5*boundary.z);

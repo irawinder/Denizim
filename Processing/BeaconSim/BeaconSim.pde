@@ -27,18 +27,15 @@ void setup() {
 
   // Run application at a specified pixel dimension
   size(1280, 800, P3D);
-  surface.setResizable(true);
   
-  /* Enable this code for a full screen demonstration
   // Run application to match native screen resolution
-  fullScreen(P3D);
-  */
+  //fullScreen(P3D);
   
   // Sets Color Mode to Hue, Saturation, and Brightness
   colorMode(HSB);
   
   // Initialize the environment
-  city = new Field(800, 800, 50);
+  city = new Field(FIELD_L, FIELD_W, FIELD_H);
   
   // Initialize Horizontal Scrollbar
   hs = new HScrollbar(int(MARGIN*width), int((1-2*MARGIN)*height), int((1-2*MARGIN)*width), int(MARGIN*height), 5);
@@ -86,7 +83,7 @@ void draw2D() {
   // Draw Help Text
   pushMatrix();
   translate(width/2, MARGIN*height);
-  fill(lnColor, 255-baseAlpha);
+  fill(lnColor, uiFade*(255-baseAlpha));
   textAlign(CENTER, TOP);
   text("Press 'r' to reset camera position", 0, 0);
   popMatrix();

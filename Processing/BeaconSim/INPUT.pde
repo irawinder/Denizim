@@ -6,6 +6,17 @@ int activeInput = -1;
 
 void updateInputs() {
   
+  // Fade input controls when not in use
+  if (mousePressed) {
+    uiFade = 1.0;
+  } else {
+    if (uiFade > 0.1) {
+      uiFade *= 0.99;
+    } else {
+      uiFade = 0;
+    }
+  }
+  
   // Update All Scroll and Drag Inputs
   if (!mousePressed) {
     if (drag.updating()) {
@@ -95,12 +106,12 @@ class HScrollbar {
 
   void display() {
     noStroke();
-    fill(204, baseAlpha);
+    fill(204, uiFade*baseAlpha);
     rect(xpos, ypos, swidth, sheight, sheight);
     if (over || locked) {
-      fill(lnColor, baseAlpha);
+      fill(lnColor, uiFade*baseAlpha);
     } else {
-      fill(102, 102, 102, baseAlpha);
+      fill(102, 102, 102, uiFade*baseAlpha);
     }
     ellipse(spos + sheight/2, ypos + sheight/2, sheight, sheight);
   }
@@ -177,12 +188,12 @@ class VScrollbar {
 
   void display() {
     noStroke();
-    fill(204, baseAlpha);
+    fill(204, uiFade*baseAlpha);
     rect(xpos, ypos, swidth, sheight, swidth);
     if (over || locked) {
-      fill(lnColor, baseAlpha);
+      fill(lnColor, uiFade*baseAlpha);
     } else {
-      fill(102, 102, 102, baseAlpha);
+      fill(102, 102, 102, uiFade*baseAlpha);
     }
     ellipse(xpos + swidth/2, spos + swidth/2, swidth, swidth);
   }
@@ -306,9 +317,14 @@ void mousePressed() {
   }
 }
 
+void mouseMoved() {
+  uiFade = 1.0;
+}
+
 void keyPressed() {
   switch(key) {
     case 'r':
+      uiFade = 1.0;
       resetControls();
       break;
     case 'b':
@@ -326,6 +342,6 @@ void resetControls() {
   vs.newspos = vs.sheight/2;
   drag.x_offset = 0;
   drag.y_offset = 0;
-  drag.camX_init = 0;
-  drag.camY_init = 0;
+  drag.camX_init = CAMX_DEFAULT;
+  drag.camY_init = CAMY_DEFAULT;
 }
