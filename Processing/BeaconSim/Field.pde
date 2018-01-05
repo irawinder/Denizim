@@ -4,6 +4,8 @@
  */
 
 class Field {
+  // Bounding Box for Our Environment, Used to focus camera
+  // Remember that (0,0) is in upper-left corner!
   PVector boundary;
   
   // Block objects in our field
