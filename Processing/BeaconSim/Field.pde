@@ -13,9 +13,14 @@ class Field {
   void render() {
     
     //Draw Bounding Box
-    stroke(lnColor, baseAlpha);
-    noFill();
+    stroke(lnColor);
+    fill(lnColor, baseAlpha);
+    pushMatrix();
+    translate(0.5*boundary.x, 0.5*boundary.y, 0.5*boundary.z);
     box(boundary.x, boundary.y, boundary.z);
+    popMatrix();
+    fill(lnColor);
+    ellipse(0, 0, 20, 20);
   }
 }
 
