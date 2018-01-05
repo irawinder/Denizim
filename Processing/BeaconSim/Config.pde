@@ -29,7 +29,7 @@ float camRotation = 0; // (0 - 2*PI)
 float MAX_ZOOM = 0.1;
 float MIN_ZOOM = 2.0;
 float CAMX_DEFAULT = 0;
-float CAMY_DEFAULT = - 0.14 * FIELD_L;
+float CAMY_DEFAULT = - 0.12 * FIELD_L;
 float camZoom = 0.6;
 PVector camOffset = new PVector(CAMX_DEFAULT, CAMY_DEFAULT);
 
