@@ -5,12 +5,13 @@ int bgColor = 0;    // (0-255)
 // Default baseline alpha value
 int baseAlpha = 50; // (0-255)
 
-float camRotation = 0; // (0 - 2*PI)
-
 void invertColors() {
   lnColor = bgColor;
   bgColor = abs(lnColor - 255);
 }
+
+float camRotation = 0; // (0 - 2*PI)
+PVector camOffset = new PVector(0,0);
 
 // Set Camera Position
 void setCamera(PVector boundary) {

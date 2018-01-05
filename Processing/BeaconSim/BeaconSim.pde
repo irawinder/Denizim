@@ -12,6 +12,9 @@ Field city;
 // Scrollbar
 HScrollbar hs;
 
+// Drag Functions
+XYDrag drag;
+
 // Initiatizes program on startup
 void setup() {
 
@@ -29,14 +32,18 @@ void setup() {
   
   // Initialize scrollbar
   hs = new HScrollbar(0, 0.975*height, width, int(0.05*height), 5);
+  
+  // Initialize Drag Funciton
+  drag = new XYDrag(1.0, 5, 5, 5, width - 10, int(0.9*height) - 5);
+  
 }
 
 // Runs on a loop after setup()
 void draw() {
   background(bgColor);
   
-  hs.update();
-  camRotation = hs.getPosPI();
+  // Update mouse and keyboard inputs
+  updateInputs();
   
   // Draw 3D Graphics
   draw3D();
@@ -63,10 +70,15 @@ void draw3D() {
   setCamera(city.boundary);
   
   pushMatrix();
+  
+  // Rotate Reference Frame
   translate(0.5*city.boundary.x, 0.5*city.boundary.y, 0.5*city.boundary.z);
   rotate(camRotation);
   translate(-0.5*city.boundary.x, -0.5*city.boundary.y, -0.5*city.boundary.z);
-
+  
+  // Translate Reference Frame
+  translate(camOffset.x, camOffset.y, 0);
+  
   city.render();
   
   popMatrix();
