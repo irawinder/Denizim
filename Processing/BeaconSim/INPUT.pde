@@ -356,6 +356,9 @@ void keyPressed() {
         case 'd':
           f.removeBlock();
           break;
+        case 'b':
+          f.randomizeBlocks();
+          break;
         case '1':
           b.l -= 2;
           break;
@@ -391,6 +394,28 @@ void keyPressed() {
         }
       }
     }
+  } else {
+    
+    switch(key) {
+      case '0':
+        f.randomBeacons(0);
+        break;
+      case '1':
+        f.randomBeacons(1);
+        break;
+      case '2':
+        f.randomBeacons(2);
+        break;
+      case '3':
+        f.randomBeacons(3);
+        break;
+      case '4':
+        f.randomBeacons(4);
+        break;
+      case '5':
+        f.randomBeacons(4);
+        break;
+    }
   }
   
   switch(key) {
@@ -398,14 +423,14 @@ void keyPressed() {
       uiFade = 1.0;
       resetControls();
       break;
-    case 'b':
-      f.randomizeBlocks();
-      break;
     case 'p':
       f.randomizePeople();
       break;
     case 'i':
       initFields();
+      break;
+    case 'm':
+      drawMap = !drawMap;
       break;
     case 'E':
       f.blockEditing = !f.blockEditing;
@@ -417,7 +442,7 @@ void keyPressed() {
 // resets and centers camera view
 void resetControls() {
   hs.newspos = hs.swidth/2;
-  vs.newspos = vs.sheight/2;
+  vs.newspos = 0.2*vs.sheight;
   drag.x_offset = 0;
   drag.y_offset = 0;
   drag.camX_init = CAMX_DEFAULT;

@@ -2,6 +2,8 @@
 ArrayList<Field> city;
 int cityIndex = 0;
 
+PImage logo;
+
 void initFields() {
   
   city = new ArrayList<Field>();
@@ -19,4 +21,6 @@ void initFields() {
     
   // 30 Rockefeller Center
   // TBA
+  
+  logo = loadImage("soofa_logo.png");
 }

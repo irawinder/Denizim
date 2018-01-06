@@ -21,6 +21,9 @@ class Field {
   // Person objects in our field
   ArrayList<Person> people;
   
+  // Sensor objects in our field
+  ArrayList<Sensor> beacons;
+  
   Field(float l, float w, float h, PImage img) {
     boundary = new PVector(l, w, h);
     
@@ -33,14 +36,22 @@ class Field {
     }
     
     people = new ArrayList<Person>();
-    Person p;
-    for (int i=0; i<900; i++) {
-      p = new Person();
-      p.randomize(boundary.x, boundary.y);
-      people.add(p);
-    }
+    randomizePeople();
+    
+    beacons = new ArrayList<Sensor>(); 
+    randomBeacons(3);
     
     map = img;
+  }
+  
+  void randomBeacons(int num) {
+    beacons.clear(); 
+    Sensor s;
+    for (int i=0; i<num; i++) {
+      s = new Sensor();
+      s.randomize(0.22*boundary.x, 0.27*boundary.y, 0.58*boundary.x, 0.43*boundary.y, s.DIAM/2, s.DIAM/2);
+      beacons.add(s);
+    }
   }
   
   void randomizeBlocks() {
@@ -50,8 +61,13 @@ class Field {
   }
   
   void randomizePeople() {
-    for(Person p: people) {
+    people.clear();
+    Person p;
+    for (int i=0; i<900; i++) {
+      p = new Person();
       p.randomize(boundary.x, boundary.y);
+      if (random(1.0) < 0.05) p.numDetects = 1;
+      people.add(p);
     }
   }
   
@@ -126,7 +142,7 @@ class Field {
     // Draw Ground
     pushMatrix();
     translate(0, 0, -1);
-    if (map == null) {
+    if (map == null || !drawMap) {
       // Draw a Rectangle
       fill(50, 255 - baseAlpha);
       noStroke();
@@ -137,8 +153,18 @@ class Field {
       image(map, 0, 0, boundary.x, boundary.y);
     }
     popMatrix();
-
-    // Draw Some Buildings
+    
+    // Draw Beacons
+    for(Sensor s: beacons) {
+      pushMatrix();
+      translate(s.loc.x, s.loc.y, -5);
+      noStroke();
+      fill(s.col);
+      sphere(s.DIAM);
+      popMatrix();
+    }
+    
+    // Draw Buildings
     for(int i=0; i<blocks.size(); i++) {
       Block b = blocks.get(i);
       pushMatrix();
@@ -152,26 +178,73 @@ class Field {
       popMatrix();
     }
     
-    // Draw Some People
+    // Draw People
     for(Person p: people) {
+      // Only Draw People Within Bounds
       if (p.loc.x > - BUFFER && p.loc.x < boundary.x + BUFFER &&
           p.loc.y > - BUFFER && p.loc.y < boundary.y + BUFFER ) {
             
         pushMatrix();
         translate(p.loc.x, p.loc.y, p.h/2);
         
+        // Determine Color
+        float scale;
+        color col;
+        float vis;
+        if (p.detected) {
+          //col = p.col;
+          vis = min(1, p.numDetects-1) / 1.0;
+          col = color(150 - 50*vis, 255, 255);
+          scale = 1.5;
+        } else {
+          col = color(255, baseAlpha);
+          scale = 1.0;
+        }
+        
+        // Determine Fade
         float fadeX, fadeY, fadeVal;
         fadeX = abs(p.loc.x - boundary.x/2) - boundary.x/2;
         fadeY = abs(p.loc.y - boundary.y/2) - boundary.y/2;
         fadeVal = 1 - max(fadeX, fadeY) / BUFFER;
+        
+        // Apply Fade, Color, and Draw Person
         if (fadeVal > 0) {
-          fill(p.col, fadeVal*255);
+          fill(col, fadeVal*255);
         } else {
-          fill(p.col);
+          fill(col);
         }
-        box(p.l, p.w, p.h);
+        box(scale*p.l, scale*p.w, scale*p.h);
+        
         popMatrix();
       }
+    }
+    
+    float beaconFade = sq(1 - float(frameCounter) / PING_FREQ);
+    
+    // Draw Beacon Min Range
+    for(Sensor s: beacons) {
+      pushMatrix();
+      translate(s.loc.x, s.loc.y, -5);
+      noStroke();
+      if (beaconFade > 0.1) {
+        fill(lnColor, beaconFade*baseAlpha);
+        sphere(2*s.MIN_RANGE);
+      }
+      popMatrix();
+    }
+    
+    // Draw Beacon Max Range
+    if (beaconFade > 0.1) {
+      hint(DISABLE_DEPTH_TEST);
+      for(Sensor s: beacons) {
+        pushMatrix();
+        translate(s.loc.x, s.loc.y, 0);
+        noStroke();
+        fill(lnColor, beaconFade*0.5*baseAlpha);
+        ellipse(0, 0, 2*s.MAX_RANGE, 2*s.MAX_RANGE);
+        popMatrix();
+      }
+      hint(ENABLE_DEPTH_TEST);
     }
     
     // Draw Cursor
@@ -191,6 +264,8 @@ class Person {
   float l, w, h; // length, width, and height
   float MAX_SPEED = 15.0; // pixels per second
   color col;
+  boolean detected = false;
+  int numDetects = 0;
   
   Person() {
     loc = new PVector(0, 0);
@@ -206,7 +281,7 @@ class Person {
   void randomize(float x_max, float y_max) {
     loc.x = random(0, x_max);
     loc.y = random(0, y_max);
-    col = color(random(10, 90), 255, 255, 200);
+    col = color(random(50, 100), 255, 255, 200);
   }
   
   void update(Field f) {
@@ -230,7 +305,62 @@ class Person {
 }
 
 class Sensor {
+  PVector loc;
+  float l, w, h; // length, width, and height
+  color col;
+  int DIAM = 10;
+  float MIN_RANGE = 0.5*75;  // ft
+  float MAX_RANGE = 0.5*450; // ft
   
+  Sensor() {
+    loc = new PVector(0, 0);
+    l = DIAM;
+    w = DIAM;
+    h = DIAM;
+    col = soofaColor;
+  }
+  
+  Sensor(float x, float y) {
+    loc = new PVector(x, y);
+    l = DIAM;
+    w = DIAM;
+    h = DIAM;
+    col = soofaColor;
+  }
+  
+  void randomize(float x_max, float y_max, float l_max, float w_max, float d_min, float d_max) {
+    loc.x = random(x_max + d_max/2, x_max + l_max - d_max/2);
+    loc.y = random(y_max + d_max/2, y_max + w_max - d_max/2);
+    //col = color(random(100, 200), 255, 255);
+  }
+  
+  void randomize(float x_max, float y_max, float d_min, float d_max) {
+    loc.x = random(d_max/2, x_max - d_max/2);
+    loc.y = random(d_max/2, y_max - d_max/2);
+    //col = color(random(100, 200), 255, 255);
+  }
+  
+  // Determines if a nearby person is being detected by sensor
+  boolean detect(PVector pos, boolean currentlyReading) {
+    PVector d = new PVector(pos.x-loc.x, pos.y-loc.y);
+    float distance = d.mag();
+    boolean detect = false;
+    if (distance > MAX_RANGE) {
+      detect = false;
+    } else if (currentlyReading) {
+      detect = true;
+    } else if (distance <= MIN_RANGE) {
+      detect = true;
+    } else if (distance <= MAX_RANGE && distance > MIN_RANGE) {
+      float probability =  pow(1.0 - (distance - MIN_RANGE) / (MAX_RANGE - MIN_RANGE), 3);
+      if (random(1.0) < probability) {
+        detect = true;
+      } else {
+        detect = false;
+      }
+    }
+    return detect;
+  }
 }
 
 class Block {
