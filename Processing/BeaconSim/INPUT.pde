@@ -356,6 +356,9 @@ void keyPressed() {
         case 'd':
           f.removeBlock();
           break;
+        case 'b':
+          f.randomizeBlocks();
+          break;
         case '1':
           b.l -= 2;
           break;
@@ -398,11 +401,11 @@ void keyPressed() {
       uiFade = 1.0;
       resetControls();
       break;
-    case 'b':
-      f.randomizeBlocks();
-      break;
     case 'p':
       f.randomizePeople();
+      break;
+    case 's':
+      f.randomizeSensors();
       break;
     case 'i':
       initFields();

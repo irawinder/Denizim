@@ -21,6 +21,9 @@ class Field {
   // Person objects in our field
   ArrayList<Person> people;
   
+  // Sensor objects in our field
+  ArrayList<Sensor> beacons;
+  
   Field(float l, float w, float h, PImage img) {
     boundary = new PVector(l, w, h);
     
@@ -40,6 +43,14 @@ class Field {
       people.add(p);
     }
     
+    beacons = new ArrayList<Sensor>(); 
+    Sensor s;
+    for (int i=0; i<5; i++) {
+      s = new Sensor();
+      s.randomize(0.22*boundary.x, 0.27*boundary.y, 0.62*boundary.x, 0.57*boundary.y, s.DIAM/2, s.DIAM/2);
+      beacons.add(s);
+    }
+    
     map = img;
   }
   
@@ -52,6 +63,12 @@ class Field {
   void randomizePeople() {
     for(Person p: people) {
       p.randomize(boundary.x, boundary.y);
+    }
+  }
+  
+  void randomizeSensors() {
+    for(Sensor s: beacons) {
+      s.randomize(0.22*boundary.x, 0.27*boundary.y, 0.58*boundary.x, 0.43*boundary.y, s.DIAM/2, s.DIAM/2);
     }
   }
   
@@ -174,6 +191,15 @@ class Field {
       }
     }
     
+    // Draw Some Beacons
+    for(Sensor s: beacons) {
+      pushMatrix();
+      translate(s.loc.x, s.loc.y, s.h/2);
+      fill(s.col);
+      sphere(s.DIAM);
+      popMatrix();
+    }
+    
     // Draw Cursor
     if (blockEditing) {
       pushMatrix();
@@ -230,7 +256,40 @@ class Person {
 }
 
 class Sensor {
+  PVector loc;
+  float l, w, h; // length, width, and height
+  color col;
+  int DIAM = 10;
+  float MIN_RANGE = 75;  // ft
+  float MAX_RANGE = 450; // ft
   
+  Sensor() {
+    loc = new PVector(0, 0);
+    l = DIAM;
+    w = DIAM;
+    h = DIAM;
+    col = color(255);
+  }
+  
+  Sensor(float x, float y) {
+    loc = new PVector(x, y);
+    l = DIAM;
+    w = DIAM;
+    h = DIAM;
+    col = color(255);
+  }
+  
+  void randomize(float x_max, float y_max, float l_max, float w_max, float d_min, float d_max) {
+    loc.x = random(x_max + d_max/2, x_max + l_max - d_max/2);
+    loc.y = random(y_max + d_max/2, y_max + w_max - d_max/2);
+    col = color(random(100, 200), 255, 255);
+  }
+  
+  void randomize(float x_max, float y_max, float d_min, float d_max) {
+    loc.x = random(d_max/2, x_max - d_max/2);
+    loc.y = random(d_max/2, y_max - d_max/2);
+    col = color(random(100, 200), 255, 255);
+  }
 }
 
 class Block {
