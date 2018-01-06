@@ -87,13 +87,13 @@ class Field {
       row.setFloat(3, b.w);
       row.setFloat(4, b.h);
     }
-    saveTable(blockTable, "data/" + cityIndex + "/blockTable_" + cityIndex + ".tsv");
+    saveTable(blockTable, "data/" + cityIndex + "/blockTable.tsv");
     println(blocks.size() + " blocks saved.");
   }
   
-  void loadBlocks() {
+  void loadBlocks(String name) {
     // Data file for saving/loading building objects
-    Table blockTable = loadTable("data/" + cityIndex + "/blockTable_" + cityIndex + ".tsv");
+    Table blockTable = loadTable("data/" + name);
     
     blocks.clear();
     float x, y, l, w, h;
@@ -107,7 +107,7 @@ class Field {
       b = new Block(x, y, l, w, h);
       blocks.add(b);
     }
-    saveTable(blockTable, "data/" + cityIndex + "/blockTable_" + cityIndex + ".tsv");
+    selectedBlock = 0;
     println(blockTable.getRowCount() + " blocks loaded.");
   }
   

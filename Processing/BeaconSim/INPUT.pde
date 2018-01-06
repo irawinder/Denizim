@@ -343,7 +343,7 @@ void keyPressed() {
         f.saveBlocks();
         break;
       case 'L':
-        f.loadBlocks();
+        f.loadBlocks(cityIndex + "/" +"blockTable.tsv");
         break;
     }
     
@@ -403,6 +403,9 @@ void keyPressed() {
       break;
     case 'p':
       f.randomizePeople();
+      break;
+    case 'i':
+      initFields();
       break;
     case 'E':
       f.blockEditing = !f.blockEditing;
