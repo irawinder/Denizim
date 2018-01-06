@@ -8,6 +8,9 @@ class Field {
   // Remember that (0,0) is in upper-left corner!
   PVector boundary;
   
+  // Bounding Area(s) for Wandering Agents
+  Fence site;
+  
   float BUFFER = 50; // feet
   
   // Objects for importing data files such as CSVs and Graphics
@@ -26,6 +29,9 @@ class Field {
   
   Field(float l, float w, float h, PImage img) {
     boundary = new PVector(l, w, h);
+    
+    site = new Fence(0.26*boundary.x, 0.32*boundary.y, 0.50*boundary.x, 0.38*boundary.y);
+    //site = new Fence(0, 0, l, w);
     
     blocks = new ArrayList<Block>();
     Block b;
@@ -65,7 +71,7 @@ class Field {
     Person p;
     for (int i=0; i<900; i++) {
       p = new Person();
-      p.randomize(boundary.x, boundary.y);
+      p.randomize(site.x, site.y, site.l, site.w);
       if (random(1.0) < 0.05) p.numDetects = 1;
       people.add(p);
     }
@@ -181,8 +187,8 @@ class Field {
     // Draw People
     for(Person p: people) {
       // Only Draw People Within Bounds
-      if (p.loc.x > - BUFFER && p.loc.x < boundary.x + BUFFER &&
-          p.loc.y > - BUFFER && p.loc.y < boundary.y + BUFFER ) {
+      if (p.loc.x > site.x - BUFFER && p.loc.x < site.x + site.l + BUFFER &&
+          p.loc.y > site.y - BUFFER && p.loc.y < site.y + site.w + BUFFER ) {
             
         pushMatrix();
         translate(p.loc.x, p.loc.y, p.h/2);
@@ -203,8 +209,8 @@ class Field {
         
         // Determine Fade
         float fadeX, fadeY, fadeVal;
-        fadeX = abs(p.loc.x - boundary.x/2) - boundary.x/2;
-        fadeY = abs(p.loc.y - boundary.y/2) - boundary.y/2;
+        fadeX = abs(p.loc.x - site.x - site.l/2) - site.l/2;
+        fadeY = abs(p.loc.y - site.y - site.w/2) - site.w/2;
         fadeVal = 1 - max(fadeX, fadeY) / BUFFER;
         
         // Apply Fade, Color, and Draw Person
@@ -278,9 +284,9 @@ class Person {
     col = color(255);
   }
   
-  void randomize(float x_max, float y_max) {
-    loc.x = random(0, x_max);
-    loc.y = random(0, y_max);
+  void randomize(float x, float y, float l, float w) {
+    loc.x = random(x, x+l);
+    loc.y = random(y, y+w);
     col = color(random(50, 100), 255, 255, 200);
   }
   
@@ -293,14 +299,14 @@ class Person {
     if (vel.mag() > MAX_SPEED) vel.setMag(MAX_SPEED);
     loc.add(vel);
     
-    if (loc.x < - f.BUFFER) 
-      loc.x = f.boundary.x + f.BUFFER;
-    if (loc.x > f.boundary.x + f.BUFFER) 
-      loc.x = - f.BUFFER;
-    if (loc.y < -f.BUFFER) 
-      loc.y = f.boundary.y + f.BUFFER;
-    if (loc.y > f.boundary.y + f.BUFFER) 
-      loc.y = - f.BUFFER;
+    if (loc.x < f.site.x - f.BUFFER) 
+      loc.x = f.site.x + f.site.l + f.BUFFER;
+    if (loc.x > f.site.x + f.site.l + f.BUFFER) 
+      loc.x = f.site.x - f.BUFFER;
+    if (loc.y < f.site.y - f.BUFFER) 
+      loc.y = f.site.y + f.site.w + f.BUFFER;
+    if (loc.y > f.site.y + f.site.w + f.BUFFER) 
+      loc.y = f.site.y - f.BUFFER;
   }
 }
 
@@ -393,3 +399,21 @@ class Block {
     col = color(random(100, 200), 255, 255);
   }
 }
+
+// Specifies a boundary condition for People Agents
+class Fence {
+  float x, y, l, w;
+  
+  Fence(float x, float y, float l, float w) {
+    this.x = x;
+    this.y = y;
+    this.l = l;
+    this.w = w;
+  }
+}
+
+// Specifies a path condition for People Agents
+class Path {
+  
+}
+  
