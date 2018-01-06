@@ -12,9 +12,6 @@ String description = "Simulates and visualizes wireless " +
                      "sensors. Sensors detect synthetic people that " +
                      "ambulate through an urban environment.";
 
-// Class that contains our urban sensor simulation
-Field city;
-
 // Scrollbars (horizontal and vertical
 HScrollbar hs;
 VScrollbar vs;
@@ -35,7 +32,10 @@ void setup() {
   colorMode(HSB);
   
   // Initialize the environment
-  city = new Field(FIELD_L, FIELD_W, FIELD_H);
+  initFields();
+  
+  // Initialize the Camera
+  initCamera();
   
   // Initialize Horizontal Scrollbar
   hs = new HScrollbar(int(MARGIN*width), int((1-2*MARGIN)*height), int((1-2*MARGIN)*width), int(MARGIN*height), 5);
@@ -57,16 +57,17 @@ void draw() {
   updateInputs();
   
   // Update Simulation Aspects
-  for (Person p: city.people) {
+  Field f = city.get(cityIndex);
+  
+  for (Person p: f.people) {
     p.update();
   }
   
   // Draw 3D Graphics
-  draw3D();
+  draw3D(f);
 
   //Draw 2D Graphics
   draw2D();
-  
   
 }
 
@@ -99,21 +100,21 @@ void draw2D() {
   hint(ENABLE_DEPTH_TEST);
 }
 
-void draw3D() {
-  setCamera(city.boundary);
+void draw3D(Field f) {
+  setCamera(f.boundary);
   
   pushMatrix();
   
   // Rotate Reference Frame
-  translate(0.5*city.boundary.x, 0.5*city.boundary.y, 0.5*city.boundary.z);
+  translate(0.5*f.boundary.x, 0.5*f.boundary.y, 0.5*f.boundary.z);
   rotate(camRotation);
-  translate(-0.5*city.boundary.x, -0.5*city.boundary.y, -0.5*city.boundary.z);
+  translate(-0.5*f.boundary.x, -0.5*f.boundary.y, -0.5*f.boundary.z);
   
   // Translate Reference Frame
   translate(camOffset.x, camOffset.y, 0);
   
   // Draw 3D Objects
-  city.render();
+  f.render();
   
   popMatrix();
 }

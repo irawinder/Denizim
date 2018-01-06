@@ -328,11 +328,18 @@ void keyPressed() {
       resetControls();
       break;
     case 'b':
-      city.randomizeBlocks();
+      city.get(cityIndex).randomizeBlocks();
       break;
     case 'p':
-      city.randomizePeople();
+      city.get(cityIndex).randomizePeople();
       break;
+    case 'S':
+      city.get(cityIndex).saveBlocks();
+      break;
+    case 'L':
+      city.get(cityIndex).loadBlocks();
+      break;
+    
   }
 }
 

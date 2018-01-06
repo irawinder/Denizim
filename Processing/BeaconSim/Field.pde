@@ -8,20 +8,23 @@ class Field {
   // Remember that (0,0) is in upper-left corner!
   PVector boundary;
   
+  // Objects for importing data files such as CSVs and Graphics
+  PImage map;
+  
   // Block objects in our field
   ArrayList<Block> blocks;
   
   // Person objects in our field
   ArrayList<Person> people;
   
-  Field(float l, float w, float h) {
+  Field(float l, float w, float h, PImage img) {
     boundary = new PVector(l, w, h);
     
     blocks = new ArrayList<Block>();
     Block b;
-    for (int i=0; i<400; i++) {
+    for (int i=0; i<50; i++) {
       b = new Block();
-      b.randomize(boundary.x, boundary.y, 5, 40);
+      b.randomize(boundary.x, boundary.y, 50, 100);
       blocks.add(b);
     }
     
@@ -32,11 +35,13 @@ class Field {
       p.randomize(boundary.x, boundary.y);
       people.add(p);
     }
+    
+    map = img;
   }
   
   void randomizeBlocks() {
     for(Block b: blocks) {
-      b.randomize(boundary.x, boundary.y, 5, 40);
+      b.randomize(boundary.x, boundary.y, 50, 100);
     }
   }
   
@@ -44,6 +49,47 @@ class Field {
     for(Person p: people) {
       p.randomize(boundary.x, boundary.y);
     }
+  }
+  
+  void saveBlocks() {
+    // Data file for saving/loading building objects
+    Table blockTable = new Table();
+    blockTable.addColumn();
+    blockTable.addColumn();
+    blockTable.addColumn();
+    blockTable.addColumn();
+    blockTable.addColumn();
+    TableRow row;
+    for (Block b: blocks) {
+      row = blockTable.addRow();
+      row.setFloat(0, b.loc.x);
+      row.setFloat(1, b.loc.y);
+      row.setFloat(2, b.l);
+      row.setFloat(3, b.w);
+      row.setFloat(4, b.h);
+    }
+    saveTable(blockTable, "data/" + cityIndex + "/blockTable_" + cityIndex + ".tsv");
+    println(blocks.size() + " blocks saved.");
+  }
+  
+  void loadBlocks() {
+    // Data file for saving/loading building objects
+    Table blockTable = loadTable("data/" + cityIndex + "/blockTable_" + cityIndex + ".tsv");
+    
+    blocks.clear();
+    float x, y, l, w, h;
+    Block b;
+    for (int i=0; i<blockTable.getRowCount(); i++) {
+      x = blockTable.getFloat(i, 0);
+      y = blockTable.getFloat(i, 1);
+      l = blockTable.getFloat(i, 2);
+      w = blockTable.getFloat(i, 3);
+      h = blockTable.getFloat(i, 4);
+      b = new Block(x, y, l, w, h);
+      blocks.add(b);
+    }
+    saveTable(blockTable, "data/" + cityIndex + "/blockTable_" + cityIndex + ".tsv");
+    println(blockTable.getRowCount() + " blocks loaded.");
   }
   
   void render() {
@@ -56,12 +102,19 @@ class Field {
     box(boundary.x, boundary.y, boundary.z);
     popMatrix();
     
-    // Draw Some Grass
-    fill(50, 255 - baseAlpha);
-    noStroke();
+    // Draw Ground
     pushMatrix();
     translate(0, 0, -1);
-    rect(0, 0, boundary.x, boundary.y);
+    if (map == null) {
+      // Draw a Rectangle
+      fill(50, 255 - baseAlpha);
+      noStroke();
+      rect(0, 0, boundary.x, boundary.y);
+    } else {
+      // Draw Ground Map
+      tint(255, 255 - baseAlpha);
+      image(map, 0, 0, boundary.x, boundary.y);
+    }
     popMatrix();
 
     // Draw Some Buildings
@@ -97,7 +150,7 @@ class Person {
     acc = new PVector(0, 0);
     l = 2;
     w = 2;
-    h = 5;
+    h = 6;
     MAX_SPEED /= 60.0; // convert from seconds to frames
     col = color(255);
   }
@@ -131,6 +184,14 @@ class Block {
     l = 0;
     w = 0;
     h = 0;
+    col = color(255);
+  }
+  
+  Block(float x, float y, float l, float w, float h) {
+    loc = new PVector(x, y);
+    this.l = l;
+    this.w = w;
+    this.h = h;
     col = color(255);
   }
   
