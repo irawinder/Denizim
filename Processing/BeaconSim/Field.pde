@@ -8,8 +8,7 @@ class Field {
   // Remember that (0,0) is in upper-left corner!
   PVector boundary;
   
-  float BUFFER = 40; // feet
-  float FADE_BUFFER = 10; // feet
+  float BUFFER = 50; // feet
   
   // Objects for importing data files such as CSVs and Graphics
   PImage map;
