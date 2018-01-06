@@ -60,7 +60,7 @@ void draw() {
   Field f = city.get(cityIndex);
   
   for (Person p: f.people) {
-    p.update();
+    p.update(f);
   }
   
   // Draw 3D Graphics

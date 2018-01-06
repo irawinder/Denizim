@@ -155,8 +155,8 @@ class Field {
     
     // Draw Some People
     for(Person p: people) {
-      if (p.loc.x >= - BUFFER && p.loc.x <= boundary.x + BUFFER &&
-          p.loc.y >= - BUFFER && p.loc.y <= boundary.y + BUFFER ) {
+      if (p.loc.x > - BUFFER && p.loc.x < boundary.x + BUFFER &&
+          p.loc.y > - BUFFER && p.loc.y < boundary.y + BUFFER ) {
             
         pushMatrix();
         translate(p.loc.x, p.loc.y, p.h/2);
@@ -210,7 +210,7 @@ class Person {
     col = color(random(10, 90), 255, 255, 200);
   }
   
-  void update() {
+  void update(Field f) {
     //acc = new PVector(random(-1, 1), random(-1, 1));
     //acc.setMag(random(-0.1, 0.1));
     acc.x += random(-1, 1);
@@ -218,6 +218,15 @@ class Person {
     vel.add(acc);
     if (vel.mag() > MAX_SPEED) vel.setMag(MAX_SPEED);
     loc.add(vel);
+    
+    if (loc.x < - f.BUFFER) 
+      loc.x = f.boundary.x + f.BUFFER;
+    if (loc.x > f.boundary.x + f.BUFFER) 
+      loc.x = - f.BUFFER;
+    if (loc.y < -f.BUFFER) 
+      loc.y = f.boundary.y + f.BUFFER;
+    if (loc.y > f.boundary.y + f.BUFFER) 
+      loc.y = - f.BUFFER;
   }
 }
 
