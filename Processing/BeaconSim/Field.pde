@@ -13,6 +13,8 @@ class Field {
   
   // Block objects in our field
   ArrayList<Block> blocks;
+  int selectedBlock = 0;
+  boolean blockEditing = false;
   
   // Person objects in our field
   ArrayList<Person> people;
@@ -22,7 +24,7 @@ class Field {
     
     blocks = new ArrayList<Block>();
     Block b;
-    for (int i=0; i<50; i++) {
+    for (int i=0; i<0; i++) {
       b = new Block();
       b.randomize(boundary.x, boundary.y, 50, 100);
       blocks.add(b);
@@ -48,6 +50,23 @@ class Field {
   void randomizePeople() {
     for(Person p: people) {
       p.randomize(boundary.x, boundary.y);
+    }
+  }
+  
+  void nextBlock() {
+    if (selectedBlock == blocks.size() - 1) {
+      selectedBlock = 0;
+    } else {
+      selectedBlock++;
+    }
+  }
+  
+  void removeBlock() {
+    if (blocks.size() > 0) {
+      blocks.remove(selectedBlock);
+      if (selectedBlock > 0) {
+        selectedBlock--;
+      }
     }
   }
   
@@ -118,10 +137,15 @@ class Field {
     popMatrix();
 
     // Draw Some Buildings
-    for(Block b: blocks) {
+    for(int i=0; i<blocks.size(); i++) {
+      Block b = blocks.get(i);
       pushMatrix();
       translate(b.loc.x, b.loc.y, b.h/2);
-      fill(b.col, 2*baseAlpha);
+      if (i == selectedBlock && blockEditing) {
+        fill(#FFFF00, 2*baseAlpha);
+      } else {
+        fill(b.col, 2*baseAlpha);
+      }
       box(b.l, b.w, b.h);
       popMatrix();
     }
@@ -132,6 +156,15 @@ class Field {
       translate(p.loc.x, p.loc.y, p.h/2);
       fill(p.col);
       box(p.l, p.w, p.h);
+      popMatrix();
+    }
+    
+    // Draw Cursor
+    if (blockEditing) {
+      pushMatrix();
+      translate(1.2*mouseX, 1.2*mouseY, 10);
+      fill(lnColor);
+      sphere(5);
       popMatrix();
     }
     

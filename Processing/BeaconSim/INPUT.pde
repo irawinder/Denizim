@@ -317,29 +317,97 @@ void mousePressed() {
   }
 }
 
+void mouseClicked() {
+  Field f = city.get(cityIndex);
+  
+  if (f.blockEditing) {
+    Block b;
+    b = new Block(1.2*mouseX, 1.2*mouseY, 50, 50, 50);
+    f.blocks.add(b);
+    if (f.blocks.size() > 1) {
+      f.selectedBlock++;
+    }
+  }
+}
+
 void mouseMoved() {
   uiFade = 1.0;
 }
 
 void keyPressed() {
+  Field f = city.get(cityIndex);
+  
+  if (f.blockEditing) {
+    switch(key) {
+      case 'S':
+        f.saveBlocks();
+        break;
+      case 'L':
+        f.loadBlocks();
+        break;
+    }
+    
+    if (f.blocks.size() > 0) {
+      Block b = f.blocks.get(f.selectedBlock);
+      switch(key) {
+        case 'n':
+          f.nextBlock();
+          break;
+        case 'd':
+          f.removeBlock();
+          break;
+        case '1':
+          b.l -= 2;
+          break;
+        case '2':
+          b.l += 2;
+          break;
+        case '3':
+          b.w -= 2;
+          break;
+        case '4':
+          b.w += 2;
+          break;
+        case '5':
+          b.h -= 2;
+          break;
+        case '6':
+          b.h += 2;
+          break;
+      }
+      
+      if (key == CODED) { 
+        if (keyCode == LEFT) {
+          b.loc.x -= 2; 
+        }  
+        if (keyCode == RIGHT) {
+          b.loc.x += 2; 
+        }  
+        if (keyCode == DOWN) {
+          b.loc.y -= 2;
+        }  
+        if (keyCode == UP) {
+          b.loc.y += 2;
+        }
+      }
+    }
+  }
+  
   switch(key) {
     case 'r':
       uiFade = 1.0;
       resetControls();
       break;
     case 'b':
-      city.get(cityIndex).randomizeBlocks();
+      f.randomizeBlocks();
       break;
     case 'p':
-      city.get(cityIndex).randomizePeople();
+      f.randomizePeople();
       break;
-    case 'S':
-      city.get(cityIndex).saveBlocks();
+    case 'E':
+      f.blockEditing = !f.blockEditing;
+      println("Editing Blocks: " + f.blockEditing);
       break;
-    case 'L':
-      city.get(cityIndex).loadBlocks();
-      break;
-    
   }
 }
 
