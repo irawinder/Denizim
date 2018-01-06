@@ -8,6 +8,9 @@ class Field {
   // Remember that (0,0) is in upper-left corner!
   PVector boundary;
   
+  float BUFFER = 40; // feet
+  float FADE_BUFFER = 10; // feet
+  
   // Objects for importing data files such as CSVs and Graphics
   PImage map;
   
@@ -152,11 +155,24 @@ class Field {
     
     // Draw Some People
     for(Person p: people) {
-      pushMatrix();
-      translate(p.loc.x, p.loc.y, p.h/2);
-      fill(p.col);
-      box(p.l, p.w, p.h);
-      popMatrix();
+      if (p.loc.x >= - BUFFER && p.loc.x <= boundary.x + BUFFER &&
+          p.loc.y >= - BUFFER && p.loc.y <= boundary.y + BUFFER ) {
+            
+        pushMatrix();
+        translate(p.loc.x, p.loc.y, p.h/2);
+        
+        float fadeX, fadeY, fadeVal;
+        fadeX = abs(p.loc.x - boundary.x/2) - boundary.x/2;
+        fadeY = abs(p.loc.y - boundary.y/2) - boundary.y/2;
+        fadeVal = 1 - max(fadeX, fadeY) / BUFFER;
+        if (fadeVal > 0) {
+          fill(p.col, fadeVal*255);
+        } else {
+          fill(p.col);
+        }
+        box(p.l, p.w, p.h);
+        popMatrix();
+      }
     }
     
     // Draw Cursor
@@ -174,7 +190,7 @@ class Field {
 class Person {
   PVector loc, vel, acc;
   float l, w, h; // length, width, and height
-  float MAX_SPEED = 30.0; // pixels per second
+  float MAX_SPEED = 15.0; // pixels per second
   color col;
   
   Person() {
@@ -191,12 +207,14 @@ class Person {
   void randomize(float x_max, float y_max) {
     loc.x = random(0, x_max);
     loc.y = random(0, y_max);
-    col = color(random(0, 100), 255, 255);
+    col = color(random(10, 90), 255, 255, 200);
   }
   
   void update() {
-    acc = new PVector(random(-1, 1), random(-1, 1));
-    acc.setMag(random(-0.1, 0.1));
+    //acc = new PVector(random(-1, 1), random(-1, 1));
+    //acc.setMag(random(-0.1, 0.1));
+    acc.x += random(-1, 1);
+    acc.y += random(-1, 1);
     vel.add(acc);
     if (vel.mag() > MAX_SPEED) vel.setMag(MAX_SPEED);
     loc.add(vel);
