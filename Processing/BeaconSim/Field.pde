@@ -143,7 +143,7 @@ class Field {
     // Draw Ground
     pushMatrix();
     translate(0, 0, -1);
-    if (map == null) {
+    if (map == null || !drawMap) {
       // Draw a Rectangle
       fill(50, 255 - baseAlpha);
       noStroke();
@@ -154,8 +154,18 @@ class Field {
       image(map, 0, 0, boundary.x, boundary.y);
     }
     popMatrix();
-
-    // Draw Some Buildings
+    
+    // Draw Beacons
+    for(Sensor s: beacons) {
+      pushMatrix();
+      translate(s.loc.x, s.loc.y, -5);
+      noStroke();
+      fill(s.col);
+      sphere(s.DIAM);
+      popMatrix();
+    }
+    
+    // Draw Buildings
     for(int i=0; i<blocks.size(); i++) {
       Block b = blocks.get(i);
       pushMatrix();
@@ -169,7 +179,33 @@ class Field {
       popMatrix();
     }
     
-    // Draw Some People
+    // Draw Beacon Min Range
+    for(Sensor s: beacons) {
+      pushMatrix();
+      translate(s.loc.x, s.loc.y, -5);
+      noStroke();
+      if (uiFade > 0) {
+        fill(lnColor, uiFade*baseAlpha);
+        sphere(s.MIN_RANGE);
+      }
+      popMatrix();
+    }
+    
+    // Draw Beacon Max Range
+    if (uiFade > 0) {
+      hint(DISABLE_DEPTH_TEST);
+      for(Sensor s: beacons) {
+        pushMatrix();
+        translate(s.loc.x, s.loc.y, 0);
+        noStroke();
+        fill(lnColor, uiFade*0.5*baseAlpha);
+        ellipse(0, 0, s.MAX_RANGE, s.MAX_RANGE);
+        popMatrix();
+      }
+      hint(ENABLE_DEPTH_TEST);
+    }
+    
+    // Draw People
     for(Person p: people) {
       if (p.loc.x > - BUFFER && p.loc.x < boundary.x + BUFFER &&
           p.loc.y > - BUFFER && p.loc.y < boundary.y + BUFFER ) {
@@ -189,15 +225,6 @@ class Field {
         box(p.l, p.w, p.h);
         popMatrix();
       }
-    }
-    
-    // Draw Some Beacons
-    for(Sensor s: beacons) {
-      pushMatrix();
-      translate(s.loc.x, s.loc.y, s.h/2);
-      fill(s.col);
-      sphere(s.DIAM);
-      popMatrix();
     }
     
     // Draw Cursor

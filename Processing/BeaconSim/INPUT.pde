@@ -410,6 +410,9 @@ void keyPressed() {
     case 'i':
       initFields();
       break;
+    case 'm':
+      drawMap = !drawMap;
+      break;
     case 'E':
       f.blockEditing = !f.blockEditing;
       println("Editing Blocks: " + f.blockEditing);

@@ -15,6 +15,9 @@ int grassColor = #95AA13;
 // Number to apply to UI transparency
 float uiFade = 1.0;  // 0.0 - 1.0
 
+// Draw Realistic Ground Map
+boolean drawMap = true;
+
 void invertColors() {
   lnColor = bgColor;
   bgColor = abs(lnColor - 255);
