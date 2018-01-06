@@ -6,11 +6,12 @@
  *
  */
 
-String project = "Beacon Simulator\n\n" + "Ira Winder\nChanging Environments\n\n";
+String version = "Beta 1.0";
 
-String description = "Simulates and visualizes wireless " +
-                     "sensors. Sensors detect synthetic people that " +
-                     "ambulate through an urban environment.";
+String project = "Soofa Spaces Simulator, " + version + "\n" + "Changing Environments\n\n";
+
+String description = "Soofa sensors can collect anonymized " +
+                     "data to help cities understand visitor behavior. ";
 
 // Scrollbars (horizontal and vertical
 HScrollbar hs;
@@ -23,10 +24,10 @@ XYDrag drag;
 void setup() {
 
   // Run application at a specified pixel dimension
-  size(1280, 800, P3D);
+  //size(1280, 800, P3D);
   
   // Run application to match native screen resolution
-  //fullScreen(P3D);
+  fullScreen(P3D);
   
   // Sets Color Mode to Hue, Saturation, and Brightness
   colorMode(HSB);
@@ -47,6 +48,7 @@ void setup() {
   // Initialize Drag Funciton
   drag = new XYDrag(1.0, 7, 5, 5, width - 10, int(0.85*height) - 5);
   
+  resetControls();
 }
 
 // Runs on a loop after setup()
@@ -61,13 +63,40 @@ void draw() {
   
   for (Person p: f.people) {
     p.update(f);
+    
+    if (frameCounter == 0) {
+      if (!p.detected) {
+        for (Sensor s: f.beacons) {
+          p.detected = s.detect(p.loc, p.detected);
+          if (p.detected) {
+            p.numDetects++;
+            break;
+          }
+        }
+      } else {
+        boolean check = false;
+        for (Sensor s: f.beacons) {
+          if(s.detect(p.loc, p.detected)) check = true;
+        }
+        if (!check) p.detected = false;
+      }
+    }
   }
+  
+  
   
   // Draw 3D Graphics
   draw3D(f);
 
-  //Draw 2D Graphics
+  // Draw 2D Graphics
   draw2D();
+  
+  //Count Frames
+  if (frameCounter < PING_FREQ - 1) {
+    frameCounter++;
+  } else {
+    frameCounter = 0;
+  }
   
 }
 
@@ -89,13 +118,41 @@ void draw2D() {
   text("Press 'r' to reset camera position", 0, 0);
   popMatrix();
   
-  // Draw Description
+  
   pushMatrix();
+  // Draw Help Canvas
   translate(MARGIN*height, MARGIN*height);
-  fill(lnColor, 255-baseAlpha);
+  fill(lnColor, baseAlpha);
+  rect( -5, -5, 220, 325, 10);
+  // Draw Logo (1500 x 719)
+  translate(10, 0);
+  image(logo, 0, 0, 0.1*1500, 0.1*719);
+  // Draw Description
+  translate(0, 0.15*719);
+  fill(lnColor);
   textAlign(LEFT, TOP);
-  text(project + description, 0, 0, 200, 0.9*height);
+  text(project + description + "\n\nLegend:", 0, 0, 200, 0.9*height);
+  //Draw Legend
+  translate(0, 128);
+  //DrawShadows
+  fill(0);
+  rect(1, 1 +  0, 4, 12, 3);
+  rect(1, 1 + 28, 4, 12, 3);
+  rect(1, 1 + 56, 4, 12, 3);
+  //DrawPeople
+  fill(100);
+  stroke(lnColor, baseAlpha);
+  rect(0, 0 +  0, 4, 12, 3);
+  noStroke();
+  fill(150, 255, 255);
+  rect(0, 0 + 28, 4, 12, 3);
+  fill(100, 255, 255);
+  rect(0, 0 + 56, 4, 12, 3);
+  //DrawText
+  fill(lnColor);
+  text("Undetected Visitor\n\nNew Visitor\n\nReturning Visitor", 10, -1);
   popMatrix();
+  
   
   hint(ENABLE_DEPTH_TEST);
 }
