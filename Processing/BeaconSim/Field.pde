@@ -8,31 +8,49 @@ class Field {
   // Remember that (0,0) is in upper-left corner!
   PVector boundary;
   
-  // Bounding Area(s) for Wandering Agents
-  Fence site;
-  boolean fenceEditing = false;
-  
   float BUFFER = 50; // feet
   
   // Objects for importing data files such as CSVs and Graphics
   PImage map;
+  
+  // Bounding Area(s) for Wandering Agents
+  ArrayList<Fence> fences;
+  int selectedFence = 0;
+  boolean fenceEditing = false;
+  
+  // Path(s) for Wandering Agents
+  ArrayList<Path> paths;
+  int selectedPath = 0;
+  boolean pathEditing = false;
   
   // Block objects in our field
   ArrayList<Block> blocks;
   int selectedBlock = 0;
   boolean blockEditing = false;
   
-  // Person objects in our field
-  ArrayList<Person> people;
-  
   // Sensor objects in our field
   ArrayList<Sensor> beacons;
+  int selectedSensor = 0;
+  boolean sensorEditing = false;
+  
+  // Person objects in our field
+  ArrayList<Person> people;
   
   Field(float l, float w, float h, PImage img) {
     boundary = new PVector(l, w, h);
     
-    site = new Fence(0.26*boundary.x, 0.32*boundary.y, 0.50*boundary.x, 0.38*boundary.y);
-    //site = new Fence(0, 0, l, w);
+    paths = new ArrayList<Path>();
+    Path p;
+    p = new Path();
+    p.randomPath(0, 0 ,boundary.x, boundary.y, 5);
+    //fen = new Fence(0, 0, l, w);
+    paths.add(p);
+    
+    fences = new ArrayList<Fence>();
+    Fence fen;
+    fen = new Fence(0.26*boundary.x, 0.32*boundary.y, 0.50*boundary.x, 0.38*boundary.y);
+    //fen = new Fence(0, 0, l, w);
+    fences.add(fen);
     
     blocks = new ArrayList<Block>();
     Block b;
@@ -70,9 +88,10 @@ class Field {
   void randomizePeople() {
     people.clear();
     Person p;
+    Fence fen = fences.get(0);
     for (int i=0; i<900; i++) {
       p = new Person();
-      p.randomize(site.x, site.y, site.l, site.w);
+      p.randomize(fen.x, fen.y, fen.l, fen.w);
       if (random(1.0) < 0.1) {
         if (freezeVisitCounter) {
           p.numDetects = 2;
@@ -194,8 +213,9 @@ class Field {
     // Draw People
     for(Person p: people) {
       // Only Draw People Within Bounds
-      if (p.loc.x > site.x - BUFFER && p.loc.x < site.x + site.l + BUFFER &&
-          p.loc.y > site.y - BUFFER && p.loc.y < site.y + site.w + BUFFER ) {
+      Fence fen = fences.get(0);
+      if (p.loc.x > fen.x - BUFFER && p.loc.x < fen.x + fen.l + BUFFER &&
+          p.loc.y > fen.y - BUFFER && p.loc.y < fen.y + fen.w + BUFFER ) {
             
         pushMatrix();
         translate(p.loc.x, p.loc.y, p.h/2);
@@ -216,8 +236,8 @@ class Field {
         
         // Determine Fade
         float fadeX, fadeY, fadeVal;
-        fadeX = abs(p.loc.x - site.x - site.l/2) - site.l/2;
-        fadeY = abs(p.loc.y - site.y - site.w/2) - site.w/2;
+        fadeX = abs(p.loc.x - fen.x - fen.l/2) - fen.l/2;
+        fadeY = abs(p.loc.y - fen.y - fen.w/2) - fen.w/2;
         fadeVal = 1 - max(fadeX, fadeY) / BUFFER;
         
         // Apply Fade, Color, and Draw Person
@@ -233,6 +253,23 @@ class Field {
     }
     
     float beaconFade = sq(1 - float(frameCounter) / PING_FREQ);
+    
+    // Draw Paths
+    Path p;
+    int numNodes;
+    PVector n1, n2;
+    stroke(lnColor);
+    for (int i=0; i<paths.size(); i++) {
+      p = paths.get(i);
+      numNodes = p.nodes.size();
+      if (numNodes > 1) {
+        for (int j=1; j<numNodes; j++) {
+          n1 = p.nodes.get(j-1);
+          n2 = p.nodes.get(j);
+          line(n1.x, n1.y, n2.x, n2.y);
+        }
+      }
+    }
     
     // Draw Beacon Min Range
     for(Sensor s: beacons) {
@@ -312,14 +349,15 @@ class Person {
     if (vel.mag() > MAX_SPEED) vel.setMag(MAX_SPEED);
     loc.add(vel);
     
-    if (loc.x < f.site.x - f.BUFFER) 
-      loc.x = f.site.x + f.site.l + f.BUFFER;
-    if (loc.x > f.site.x + f.site.l + f.BUFFER) 
-      loc.x = f.site.x - f.BUFFER;
-    if (loc.y < f.site.y - f.BUFFER) 
-      loc.y = f.site.y + f.site.w + f.BUFFER;
-    if (loc.y > f.site.y + f.site.w + f.BUFFER) 
-      loc.y = f.site.y - f.BUFFER;
+    Fence fen = f.fences.get(0);
+    if (loc.x < fen.x - f.BUFFER) 
+      loc.x = fen.x + fen.l + f.BUFFER;
+    if (loc.x > fen.x + fen.l + f.BUFFER) 
+      loc.x = fen.x - f.BUFFER;
+    if (loc.y < fen.y - f.BUFFER) 
+      loc.y = fen.y + fen.w + f.BUFFER;
+    if (loc.y > fen.y + fen.w + f.BUFFER) 
+      loc.y = fen.y - f.BUFFER;
   }
 }
 
@@ -431,6 +469,15 @@ class Path {
   
   Path() {
     nodes = new ArrayList<PVector>();
+  }
+  
+  void randomPath(float x, float y, float l, float w, int num) {
+    nodes.clear();
+    PVector n;
+    for (int i=0; i<num; i++) {
+      n = new PVector(random(x, x+l), random(y, y+w));
+      nodes.add(n);
+    }
   }
 }
   
