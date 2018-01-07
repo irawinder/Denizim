@@ -5,6 +5,8 @@ int frameCounter = 0;
 // Frame Delay between each sensor ping
 int PING_FREQ = 4*60;
 
+boolean freezeVisitCounter = true;
+
 // Fraction of screen height to use as margin
 float MARGIN = 0.03;
 

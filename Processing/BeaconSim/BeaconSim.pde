@@ -69,7 +69,7 @@ void draw() {
         for (Sensor s: f.beacons) {
           p.detected = s.detect(p.loc, p.detected);
           if (p.detected) {
-            p.numDetects++;
+            if (!freezeVisitCounter) p.numDetects++;
             break;
           }
         }

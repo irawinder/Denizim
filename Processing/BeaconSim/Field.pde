@@ -10,6 +10,7 @@ class Field {
   
   // Bounding Area(s) for Wandering Agents
   Fence site;
+  boolean fenceEditing = false;
   
   float BUFFER = 50; // feet
   
@@ -72,7 +73,13 @@ class Field {
     for (int i=0; i<900; i++) {
       p = new Person();
       p.randomize(site.x, site.y, site.l, site.w);
-      if (random(1.0) < 0.05) p.numDetects = 1;
+      if (random(1.0) < 0.1) {
+        if (freezeVisitCounter) {
+          p.numDetects = 2;
+        } else {
+          p.numDetects = 1;
+        }
+      }
       people.add(p);
     }
   }
@@ -271,7 +278,7 @@ class Person {
   float MAX_SPEED = 15.0; // pixels per second
   color col;
   boolean detected = false;
-  int numDetects = 0;
+  int numDetects;
   
   Person() {
     loc = new PVector(0, 0);
@@ -282,6 +289,12 @@ class Person {
     h = 6;
     MAX_SPEED /= 60.0; // convert from seconds to frames
     col = color(255);
+    
+    if (freezeVisitCounter) {
+      numDetects = 1;
+    } else {
+      numDetects = 0;
+    }
   }
   
   void randomize(float x, float y, float l, float w) {
@@ -414,6 +427,10 @@ class Fence {
 
 // Specifies a path condition for People Agents
 class Path {
+  ArrayList<PVector> nodes;
   
+  Path() {
+    nodes = new ArrayList<PVector>();
+  }
 }
   

@@ -328,6 +328,11 @@ void mouseClicked() {
       f.selectedBlock++;
     }
   }
+  
+  //if (f.fenceEditing) {
+  //  f.site.x = 1.2*mouseX;
+  //  f.site.y = 1.2*mouseY;
+  //}
 }
 
 void mouseMoved() {
@@ -394,6 +399,7 @@ void keyPressed() {
         }
       }
     }
+   
   } else {
     
     switch(key) {
@@ -432,9 +438,13 @@ void keyPressed() {
     case 'm':
       drawMap = !drawMap;
       break;
-    case 'E':
+    case 'B':
       f.blockEditing = !f.blockEditing;
       println("Editing Blocks: " + f.blockEditing);
+      break;
+    case 'F':
+      f.fenceEditing = !f.fenceEditing;
+      println("Editing Fences: " + f.fenceEditing);
       break;
   }
 }
