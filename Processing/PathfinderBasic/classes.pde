@@ -19,10 +19,10 @@
  *
  *     Node()      ->      Graph()        ->      Pathfinder()  ->  OUTPUT: ArrayList<PVector> shortestPath
  *
- *                            ^
- *                            |
+ *                            ^                                        |
+ *                            |                                        v
  *
- *     Obstacle()  ->  ObstacleCourse()
+ *     Obstacle()  ->  ObstacleCourse()                             Agent()                                   
  *
  */
 
@@ -71,6 +71,7 @@ class Graph {
     U = int(w/scale);
     V = int(h/scale);
     SCALE = scale;
+    img = createGraphics(width, height);
     
     nodes = new ArrayList<Node>();
     for (int i=0; i<U; i++) {
@@ -79,8 +80,6 @@ class Graph {
       }
     }
     generateEdges();
-    
-    img = createGraphics(width, height);
   }
   
   // Removes Nodes that intersect with set of obstacles
@@ -121,6 +120,7 @@ class Graph {
       }
     }
     
+    render(255, 255);
   }
   
   // Returns the number of neighbors present at a given node index
@@ -216,10 +216,6 @@ class Graph {
       }
     }
     img.endDraw();
-  }
-  
-  void display() {
-    image(img, 0, 0);
   }
 }
 
@@ -843,7 +839,7 @@ class Agent {
     r = rad;
     tolerance *= r;
     maxspeed = maxS;
-    maxforce = 0.5;
+    maxforce = 0.2;
     this.path = path;
     pathLength = path.size();
     if (random(-1, 1) <= 0 ) {
