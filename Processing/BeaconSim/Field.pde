@@ -18,7 +18,7 @@ class Field {
   int selectedFence = 0;
   boolean fenceEditing = false;
   
-  // Path(s) for Wandering Agents
+  // Objects to define and capture specific origins, destiantions, and paths
   ArrayList<Path> paths;
   int selectedPath = 0;
   boolean pathEditing = false;
@@ -27,6 +27,28 @@ class Field {
   ArrayList<Block> blocks;
   int selectedBlock = 0;
   boolean blockEditing = false;
+  
+  // Network Objects
+  ObstacleCourse course;
+  Graph network;
+  Pathfinder finder;
+  
+  void initEnvironment() {
+    // A gridded network of width x height (pixels) and node resolution (pixels)
+    //
+    int nodeResolution = 10;  // pixels
+    int graphWidth = int(boundary.x);   // pixels
+    int graphHeight = int(boundary.y); // pixels
+    network = new Graph(graphWidth, graphHeight, nodeResolution);
+    network.cullRandom(0.5); 
+    
+    // Randomly eliminates 50% of the nodes in the network
+    // An example pathfinder object used to derive the shortest path
+    // setting enableFinder to "false" will bypass the A* algorithm
+    // and return a result akin to "as the bird flies"
+    //
+    finder = new Pathfinder(network);
+  }
   
   // Sensor objects in our field
   ArrayList<Sensor> beacons;
@@ -38,13 +60,15 @@ class Field {
   
   Field(float l, float w, float h, PImage img) {
     boundary = new PVector(l, w, h);
+    initEnvironment();
     
     paths = new ArrayList<Path>();
     Path p;
-    p = new Path();
-    p.randomPath(0, 0 ,boundary.x, boundary.y, 5);
-    //fen = new Fence(0, 0, l, w);
-    paths.add(p);
+    for (int i=0; i<20; i++) {
+      p = new Path(0, 0, l, w);
+      p.solvePath(finder);
+      paths.add(p);
+    }
     
     fences = new ArrayList<Fence>();
     Fence fen;
@@ -210,6 +234,9 @@ class Field {
       popMatrix();
     }
     
+    // Draw Graph
+    image(network.img, 0, 0);
+    
     // Draw People
     for(Person p: people) {
       // Only Draw People Within Bounds
@@ -254,21 +281,11 @@ class Field {
     
     float beaconFade = sq(1 - float(frameCounter) / PING_FREQ);
     
-    // Draw Paths
+    // Draw Path
     Path p;
-    int numNodes;
-    PVector n1, n2;
-    stroke(lnColor);
     for (int i=0; i<paths.size(); i++) {
       p = paths.get(i);
-      numNodes = p.nodes.size();
-      if (numNodes > 1) {
-        for (int j=1; j<numNodes; j++) {
-          n1 = p.nodes.get(j-1);
-          n2 = p.nodes.get(j);
-          line(n1.x, n1.y, n2.x, n2.y);
-        }
-      }
+      p.display(100, 150);
     }
     
     // Draw Beacon Min Range
@@ -471,19 +488,58 @@ class Fence {
 
 // Specifies a path condition for People Agents
 class Path {
+  PVector origin;
+  PVector destination;
   ArrayList<PVector> nodes;
+  boolean enableFinder = true;
   
-  Path() {
+  Path(float x, float y, float l, float w) {
+    origin = new PVector( random(x, x+l), random(y, y+w) );
+    destination = new PVector( random(x, x+l), random(y, y+w) );
     nodes = new ArrayList<PVector>();
+    straightPath();
   }
   
-  void randomPath(float x, float y, float l, float w, int num) {
+  Path(PVector o, PVector d) {
+    origin = o;
+    destination = d;
+    nodes = new ArrayList<PVector>();
+    straightPath();
+  }
+  
+  void solvePath(Pathfinder f) {
+    nodes = f.findPath(origin, destination, enableFinder);
+  }
+  
+  void straightPath() {
     nodes.clear();
-    PVector n;
-    for (int i=0; i<num; i++) {
-      n = new PVector(random(x, x+l), random(y, y+w));
-      nodes.add(n);
+    nodes.add(origin);
+    nodes.add(destination);
+  }
+  
+  void display(int col, int alpha) {
+    Field f = city.get(cityIndex);
+
+    // Draw Shortest Path
+    //
+    noFill();
+    strokeWeight(2);
+    stroke(#00FF00, alpha); // Green
+    PVector n1, n2;
+    for (int i=1; i<nodes.size(); i++) {
+      n1 = nodes.get(i-1);
+      n2 = nodes.get(i);
+      line(n1.x, n1.y, n2.x, n2.y);
     }
+    
+    // Draw Origin (Red) and Destination (Blue)
+    //
+    stroke(#FF0000, alpha); // Red
+    ellipse(origin.x, origin.y, f.network.SCALE, f.network.SCALE);
+    stroke(#0000FF, alpha); // Blue
+    ellipse(destination.x, destination.y, f.network.SCALE, f.network.SCALE);
+    
+    strokeWeight(1);
   }
 }
   

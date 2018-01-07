@@ -431,6 +431,7 @@ void keyPressed() {
       break;
     case 'p':
       f.randomizePeople();
+      
       break;
     case 'i':
       initFields();

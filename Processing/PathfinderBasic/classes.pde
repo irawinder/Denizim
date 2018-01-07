@@ -71,7 +71,7 @@ class Graph {
     U = int(w/scale);
     V = int(h/scale);
     SCALE = scale;
-    img = createGraphics(width, height);
+    img = createGraphics(w, h);
     
     nodes = new ArrayList<Node>();
     for (int i=0; i<U; i++) {
@@ -248,6 +248,10 @@ class Pathfinder {
     parentNode = new int[networkSize];
     visited = new boolean[networkSize];
     allVisited = new ArrayList<Integer>();
+    pathNodes = new ArrayList<PVector>();
+    visitedNodes = new ArrayList<PVector>();
+    a = new PVector(0, 0);
+    b = new PVector(0, 0);
   }
   
   // a, b, represent respective index for start and end nodes in pathfinding network
