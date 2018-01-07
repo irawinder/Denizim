@@ -62,6 +62,7 @@ class Graph {
   ArrayList<Node> nodes;
   int U, V;
   float SCALE;
+  PGraphics img; // Graph is drawn once into memory
   
   // Using the canvas width and height in pixels, a gridded graph 
   // is generated with a pixel spacing of 'scale'
@@ -79,6 +80,7 @@ class Graph {
     }
     generateEdges();
     
+    img = createGraphics(width, height);
   }
   
   // Removes Nodes that intersect with set of obstacles
@@ -186,20 +188,22 @@ class Graph {
     return dist;
   }
   
-  void display(int col, int alpha) {
+  void render(int col, int alpha) {
+    img.beginDraw();
+    img.clear();
     
     // Formatting
     //
-    noFill();
-    stroke(col, alpha);
-    strokeWeight(1);
+    img.noFill();
+    img.stroke(col, alpha);
+    img.strokeWeight(1);
     
     // Draws Tangent Circles Centered at pathfinding nodes
     //
     Node n;
     for (int i=0; i<nodes.size(); i++) {
       n = nodes.get(i);
-      ellipse(n.loc.x, n.loc.y, SCALE, SCALE);
+      img.ellipse(n.loc.x, n.loc.y, SCALE, SCALE);
     }
     
     // Draws Edges that Connect Nodes
@@ -208,9 +212,14 @@ class Graph {
     for (int i=0; i<nodes.size(); i++) {
       for (int j=0; j<nodes.get(i).adj_ID.size(); j++) {
         neighbor = nodes.get(i).adj_ID.get(j);
-        line(nodes.get(i).loc.x, nodes.get(i).loc.y, nodes.get(neighbor).loc.x, nodes.get(neighbor).loc.y);
+        img.line(nodes.get(i).loc.x, nodes.get(i).loc.y, nodes.get(neighbor).loc.x, nodes.get(neighbor).loc.y);
       }
     }
+    img.endDraw();
+  }
+  
+  void display() {
+    image(img, 0, 0);
   }
 }
 
@@ -815,5 +824,141 @@ class ObstacleCourse {
       }
       
     }
+  }
+}
+
+class Agent {
+  PVector location;
+  PVector velocity;
+  PVector acceleration;
+  float r;
+  float maxforce;
+  float maxspeed;
+  float tolerance = 1;
+  ArrayList<PVector> path;
+  int pathIndex, pathLength; // Index and Amount of Nodes in a Path
+  int pathDirection; // -1 or +1 to specific directionality
+  
+  Agent(float x, float y, int rad, float maxS, ArrayList<PVector> path) {
+    r = rad;
+    tolerance *= r;
+    maxspeed = maxS;
+    maxforce = 0.5;
+    this.path = path;
+    pathLength = path.size();
+    if (random(-1, 1) <= 0 ) {
+      pathDirection = -1;
+    } else {
+      pathDirection = +1;
+    }
+    float jitterX = random(-tolerance, tolerance);
+    float jitterY = random(-tolerance, tolerance);
+    location = new PVector(x + jitterX, y + jitterY);
+    acceleration = new PVector(0, 0);
+    velocity = new PVector(0, 0);
+    pathIndex = getClosestWaypoint(location);
+  }
+  
+  PVector seek(PVector target){
+    PVector desired = PVector.sub(target,location);
+    desired.normalize();
+    desired.mult(maxspeed);
+    PVector steer = PVector.sub(desired,velocity);
+    steer.limit(maxforce);
+    return steer;
+  }
+  
+  PVector separate(ArrayList<Agent> agents){
+    float desiredseparation = 0.5 * r;
+    PVector sum = new PVector();
+    int count = 0;
+    
+    for(Agent other : agents) {
+      float d = PVector.dist(location, other.location);
+      
+      if ((d > 0 ) && (d < desiredseparation)){
+        
+        PVector diff = PVector.sub(location, other.location);
+        diff.normalize();
+        diff.div(d);
+        sum.add(diff);
+        count++;
+      }
+    }
+    if (count > 0){
+      sum.div(count);
+      sum.normalize();
+      sum.mult(maxspeed);
+      sum.sub(velocity);
+      sum.limit(maxforce);
+    }
+   return sum;   
+  }
+  
+  // calculates the index of path node closest to the given canvas coordinate 'v'.
+  // returns 0 if node not found.
+  //
+  int getClosestWaypoint(PVector v) {
+    int point_index = 0;
+    float distance = Float.MAX_VALUE;
+    float currentDist;
+    PVector p;
+    for (int i=0; i<path.size(); i++) {
+      p = path.get(i);
+      currentDist = sqrt( sq(v.x-p.x) + sq(v.y-p.y) );
+      if (currentDist < distance) {
+        point_index = i;
+        distance = currentDist;
+      }
+    }
+    return point_index;
+  }
+  
+  void update(ArrayList<Agent> agents, boolean collisionDetection) {
+    
+    // Apply Repelling Force
+    PVector separateForce = separate(agents);
+    if (collisionDetection) {
+      separateForce.mult(3);
+      acceleration.add(separateForce);
+    }
+    
+    // Apply Seek Force
+    PVector waypoint = path.get(pathIndex);
+    float jitterX = random(-tolerance, tolerance);
+    float jitterY = random(-tolerance, tolerance);
+    PVector direction = new PVector(waypoint.x + jitterX, waypoint.y + jitterY);
+    PVector seekForce = seek(direction);
+    seekForce.mult(1);
+    acceleration.add(seekForce);
+    
+    // Update velocity
+    velocity.add(acceleration);
+    
+    // Update Location
+    location.add(new PVector(velocity.x, velocity.y));
+        
+    // Limit speed
+    velocity.limit(maxspeed);
+    
+    // Reset acceleration to 0 each cycle
+    acceleration.mult(0);
+    
+    // Checks if Agents reached current waypoint
+    // If reaches endpoint, reverses direction
+    //
+    float prox = sqrt( sq(location.x - waypoint.x) + sq(location.y - waypoint.y) );
+    if (prox < 3 && path.size() > 1 ) {
+      if (pathDirection == 1 && pathIndex == pathLength-1 || pathDirection == -1 && pathIndex == 0) {
+        pathDirection *= -1;
+      }
+      pathIndex += pathDirection;
+    }
+  }
+  
+  void display(color col, int alpha) {
+    fill(col, alpha);
+    noStroke();
+    ellipse(location.x, location.y, r, r);
   }
 }
