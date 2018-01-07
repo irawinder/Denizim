@@ -89,6 +89,10 @@ void draw() {
     p.display(#FFFF00, 150);
   }
   
+  textAlign(CENTER, CENTER);
+  fill(255);
+  text("Press any key to regenerate path", width/2, height/2);
+  
 }
 
 void keyPressed() {

@@ -317,6 +317,8 @@ class Person {
   boolean detected = false;
   int numDetects;
   
+  Agent intel;
+  
   Person() {
     loc = new PVector(0, 0);
     vel = new PVector(0, 0);
@@ -332,6 +334,10 @@ class Person {
     } else {
       numDetects = 0;
     }
+    
+    //int random_index = int(random(path.size()-1));
+    //float random_speed = random(0.1, 0.3);
+    //intel = new Agent(loc.x, loc.y, 5, random_speed, path);
   }
   
   void randomize(float x, float y, float l, float w) {
