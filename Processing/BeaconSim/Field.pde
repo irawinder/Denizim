@@ -318,7 +318,13 @@ class Field {
         
         // Determine Fade
         float fadeX, fadeY, fadeVal;
-        Fence fen2 = fences.get(1);
+        
+        Fence fen2;
+        if (p.pathFinding) {
+          fen2 = fences.get(0);
+        } else {
+          fen2 = fences.get(1);
+        }
         fadeX = abs(p.loc.x - fen2.x - fen2.l/2) - fen2.l/2;
         fadeY = abs(p.loc.y - fen2.y - fen2.w/2) - fen2.w/2;
         fadeVal = 1 - max(fadeX, fadeY) / BUFFER;
