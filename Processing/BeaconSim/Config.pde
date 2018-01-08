@@ -9,6 +9,7 @@ int PING_FREQ = 4*60;
 
 boolean freezeVisitCounter = false;
 
+
 // Fraction of screen height to use as margin
 float MARGIN = 0.03;
 
@@ -31,7 +32,9 @@ int fadeTimer = 300;
 // Draw Realistic Ground Map
 boolean drawMap = true;
 
+boolean inverted = false;
 void invertColors() {
   lnColor = bgColor;
   bgColor = abs(lnColor - 255);
+  inverted = !inverted;
 }

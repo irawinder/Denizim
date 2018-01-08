@@ -465,6 +465,9 @@ void keyPressed() {
     //case 'f':
     //  f.showPaths = !f.showPaths;
     //  break;
+    case 'i':
+      invertColors();
+      break;
   }
 }
 

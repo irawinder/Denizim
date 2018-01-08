@@ -113,7 +113,7 @@ class RunningGraph {
         textAlign(CENTER, TOP);
         text(label.get(i), barX + barW/2, h + BAR_GAP);
         if (i == summary.size()-1) {
-          fill(lnColor, beaconFade*255);
+          fill(255, beaconFade*255);
           rect(barX, barY, barW, barH, 5);
           fill(lnColor);
           stroke(lnColor);

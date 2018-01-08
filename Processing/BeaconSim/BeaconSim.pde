@@ -6,7 +6,7 @@
  *
  */
 
-String version = "Beta 1.1";
+String version = "Beta 1.3";
 
 String project = "Soofa Spaces Simulator, " + version + "\n" + "Changing Environments\n\n";
 
@@ -134,6 +134,7 @@ void draw2D() {
   Field f = city.get(cityIndex);
   // Temporarily Overrides 3D Graphics Settings
   camera();
+  noLights();
   perspective();
   hint(DISABLE_DEPTH_TEST);
   
@@ -149,7 +150,7 @@ void draw2D() {
   text("Press 'r' to reset camera position", 0, 0);
   translate(0, height - 2*MARGIN*height);
   textAlign(CENTER, BOTTOM);
-  fill(lnColor, baseAlpha);
+  fill(lnColor, 2*baseAlpha);
   text("Copyright 2018 Ira Winder and Changing Environments", 0, 0);
   popMatrix();
   
@@ -163,7 +164,8 @@ void draw2D() {
   rect( 0, 0, 230, 800 - 48, 10);
   
   // Draw Logo (1500 x 719)
-  translate(20, 0);
+  translate(20, 5);
+  tint(255, 255);
   image(logo, 0, 10, 0.1*1500, 0.1*719);
   
   // Draw Description
@@ -175,7 +177,7 @@ void draw2D() {
   //Draw Legend
   translate(0, 100 + 56);
   //DrawShadows
-  fill(0);
+  fill(bgColor);
   rect(1, 1 +  0, 4, 12, 3);
   rect(1, 1 + 28, 4, 12, 3);
   rect(1, 1 + 56, 4, 12, 3);
@@ -186,14 +188,18 @@ void draw2D() {
   }
   //DrawPeople
   fill(#CCCCCC);
-  stroke(lnColor);
+  stroke(bgColor);
   rect(0, 0 +  0, 4, 12, 3);
   noStroke();
   fill(150, 255, 255);
   rect(0, 0 + 28, 4, 12, 3);
   fill(100, 255, 255);
   rect(0, 0 + 56, 4, 12, 3);
-  fill(lnColor, 100);
+  if (!inverted) {
+    fill(200);
+  } else{
+    fill(150);
+  }
   ellipse(4, 0 + 84 + 8, 18, 18);
   fill(soofaColor, 200);
   ellipse(4, 0 + 84 + 8, 10, 10);
@@ -222,7 +228,7 @@ void draw2D() {
   translate(width - height*MARGIN - 275, height*MARGIN);
   fill(lnColor, (255-baseAlpha)*uiFade);
   text("Directions:\n\n1. Use scrollbars and mouse to zoom, pan, and rotate.\n\n2. Press '1-5' to randomly generate one to five Soofa sensors, respectively.\n\n3. Press '0' to delete all Soofa Sensors.\n\n4. Click any location to add a Soofa Sensor.\n\n" +
-       "5. Press ' m ' to toggle map\n\n6. Press ' p ' to reset population", 0, 0, 200, 400);
+       "5. Press ' m ' to toggle map\n\n6. Press ' p ' to reset population\n\n7. Press ' i ' to invert colors", 0, 0, 200, 400);
   popMatrix();
   
   //Draw Summary

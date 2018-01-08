@@ -276,11 +276,15 @@ class Field {
       rect(0, 0, boundary.x, boundary.y);
     } else {
       // Draw Ground Map
-      tint(255, 255 - baseAlpha);
+      tint(255, 225);
       image(map, 0, 0, boundary.x, boundary.y);
       tint(255, 255);
     }
     popMatrix();
+    
+    if (inverted) {
+      lights();
+    }
     
     // Draw Beacons
     for(Sensor s: beacons) {
@@ -397,7 +401,7 @@ class Field {
         //fill(lnColor, beaconFade*baseAlpha);
         //sphere(2*s.MIN_RANGE*(1-beaconFade));
         noFill();
-        stroke(lnColor, beaconFade*baseAlpha);
+        stroke(255, beaconFade*baseAlpha);
         strokeWeight(2);
         ellipse(0, 0, 2*s.MIN_RANGE, 2*s.MIN_RANGE);
         strokeWeight(1);
@@ -412,7 +416,7 @@ class Field {
         translate(s.loc.x, s.loc.y, 0);
         //noStroke();
         //fill(lnColor, beaconFade*0.5*baseAlpha);
-        stroke(lnColor, beaconFade*baseAlpha);
+        stroke(255, beaconFade*baseAlpha);
         ellipse(0, 0, 2*(s.MAX_RANGE-s.MIN_RANGE)*(1-beaconFade) + 2*s.MIN_RANGE, 2*(s.MAX_RANGE-s.MIN_RANGE)*(1-beaconFade) + 2*s.MIN_RANGE);
         popMatrix();
       }
@@ -420,15 +424,17 @@ class Field {
     }
     
     // Draw Cursor
-    pushMatrix();
-    float fieldX = boundary.x*(mouseX - 0.25*width)/(0.5*width); 
-    float fieldY = boundary.y*(mouseY - 0.15*height)/(0.7*height);
-    fieldX = constrain(fieldX, 0, boundary.x);
-    fieldY = constrain(fieldY, 0, boundary.y);
-    translate(fieldX, fieldY, 10);
-    fill(lnColor);
-    sphere(5);
-    popMatrix();
+    if (!mousePressed) {
+      pushMatrix();
+      float fieldX = boundary.x*(mouseX - 0.25*width)/(0.5*width); 
+      float fieldY = boundary.y*(mouseY - 0.15*height)/(0.7*height);
+      fieldX = constrain(fieldX, 0, boundary.x);
+      fieldY = constrain(fieldY, 0, boundary.y);
+      translate(fieldX, fieldY, 10);
+      fill(255);
+      sphere(5);
+      popMatrix();
+    }
     
   }
 }

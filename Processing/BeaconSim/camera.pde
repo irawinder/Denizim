@@ -38,5 +38,7 @@ void setCamera(PVector boundary) {
   upZ =  -1;
   
   camera(eyeX, eyeY, eyeZ, centerX, centerY, centerZ, upX, upY, upZ);
-  lights(); // Default Lighting Condition
+  if (!inverted) {
+    lights(); // Default Lighting Condition
+  }
 }
