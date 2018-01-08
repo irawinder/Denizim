@@ -6,12 +6,13 @@
  *
  */
 
-String version = "Beta 1.0";
+String version = "Beta 1.1";
 
 String project = "Soofa Spaces Simulator, " + version + "\n" + "Changing Environments\n\n";
 
 String description = "Soofa sensors can collect anonymized " +
-                     "data to help cities understand visitor behavior. ";
+                     "data to help cities understand visitor behavior. " +
+                     "This simulator shows how they may work.";
 
 // Scrollbars (horizontal and vertical
 HScrollbar hs;
@@ -24,10 +25,10 @@ XYDrag drag;
 void setup() {
 
   // Run application at a specified pixel dimension
-  //size(1280, 800, P3D);
+  size(1280, 800, P3D);
   
   // Run application to match native screen resolution
-  fullScreen(P3D);
+  //fullScreen(P3D);
   
   // Sets Color Mode to Hue, Saturation, and Brightness
   colorMode(HSB);
@@ -122,22 +123,28 @@ void draw2D() {
   // Draw Help Canvas
   translate(MARGIN*height, MARGIN*height);
   fill(lnColor, baseAlpha);
-  rect( -5, -5, 220, 325, 10);
+  rect( -5, -5, 220, 475, 10);
+  
   // Draw Logo (1500 x 719)
   translate(10, 0);
   image(logo, 0, 0, 0.1*1500, 0.1*719);
+  
   // Draw Description
   translate(0, 0.15*719);
   fill(lnColor);
   textAlign(LEFT, TOP);
   text(project + description + "\n\nLegend:", 0, 0, 200, 0.9*height);
+  
   //Draw Legend
-  translate(0, 128);
+  translate(0, 100 + 56);
   //DrawShadows
   fill(0);
   rect(1, 1 +  0, 4, 12, 3);
   rect(1, 1 + 28, 4, 12, 3);
   rect(1, 1 + 56, 4, 12, 3);
+  //ellipse(5, 1 + 84 + 8, 16, 16);
+  ellipse(5, 0 + 112 + 8, 12, 12);
+  ellipse(5, 0 + 168 + 8, 12, 12);
   //DrawPeople
   fill(100);
   stroke(lnColor, baseAlpha);
@@ -147,9 +154,27 @@ void draw2D() {
   rect(0, 0 + 28, 4, 12, 3);
   fill(100, 255, 255);
   rect(0, 0 + 56, 4, 12, 3);
+  fill(lnColor, 50);
+  ellipse(4, 0 + 84 + 8, 18, 18);
+  fill(0, 255, 255, 200);
+  ellipse(4, 0 + 84 + 8, 10, 10);
+  strokeWeight(2);
+  stroke(lnColor, 150);
+  line(4, 112+5+11, 4, 168+5-5);
+  fill(0);
+  stroke(#FFFF00);
+  ellipse(4, 0 + 112 + 8, 12, 12);
+  stroke(#0000FF);
+  ellipse(4, 0 + 168 + 8, 12, 12);
   //DrawText
   fill(lnColor);
-  text("Undetected Visitor\n\nNew Visitor\n\nReturning Visitor", 10, -1);
+  text("Undetected Visitor\n\nNew Visitor\n\nReturning Visitor\n\n  Soofa Sensor\n\n  Origin\n\n - Shortest Path\n\n  Destination", 10, -1);
+  
+  //DrawDirections
+  translate(0, 225);
+  fill(lnColor, 255*uiFade);
+  text("1. Use scrollbars and mouse to zoom, pan, and rotate.\n\nPress '0-5' to randomly generate one to five Soofa sensors, respectively.\n\n2. Click any location to add a Soofa Sensor.\n\n" +
+       "Press ' m ' to toggle map\nPress ' r ' to reset camera\nPress ' i ' to reinitialize simulation\nPress ' SHIFT+B ' to toggle editor", 0, 0, 200, 400);
   popMatrix();
   
   

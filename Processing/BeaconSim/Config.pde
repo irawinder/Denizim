@@ -23,6 +23,8 @@ int soofaColor = #de1b17;
 
 // Number to apply to UI transparency
 float uiFade = 1.0;  // 0.0 - 1.0
+int FADE_TIMER = 300;
+int fadeTimer = 300;
 
 // Draw Realistic Ground Map
 boolean drawMap = true;

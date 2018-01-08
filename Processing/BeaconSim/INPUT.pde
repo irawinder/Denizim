@@ -9,11 +9,16 @@ void updateInputs() {
   // Fade input controls when not in use
   if (mousePressed) {
     uiFade = 1.0;
+    fadeTimer = FADE_TIMER;
   } else {
-    if (uiFade > 0.1) {
-      uiFade *= 0.99;
+    if (fadeTimer > 0) {
+      fadeTimer--;
     } else {
-      uiFade = 0;
+      if (uiFade > 0.1) {
+        uiFade *= 0.99;
+      } else {
+        uiFade = 0;
+      }
     }
   }
   
@@ -337,6 +342,7 @@ void mouseClicked() {
 
 void mouseMoved() {
   uiFade = 1.0;
+  fadeTimer = FADE_TIMER;
 }
 
 void keyPressed() {
@@ -430,11 +436,11 @@ void keyPressed() {
   switch(key) {
     case 'r':
       uiFade = 1.0;
+      fadeTimer = FADE_TIMER;
       resetControls();
       break;
     case 'p':
       f.randomizePeople();
-      
       break;
     case 'i':
       initFields();
