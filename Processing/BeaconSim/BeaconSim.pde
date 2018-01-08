@@ -221,8 +221,8 @@ void draw2D() {
   pushMatrix();
   translate(width - height*MARGIN - 275, height*MARGIN);
   fill(lnColor, (255-baseAlpha)*uiFade);
-  text("Directions:\n\n1. Use scrollbars and mouse to zoom, pan, and rotate.\n\n2. Press '1-5' to randomly generate one to five Soofa sensors, respectively. Press '0' to delete all Soofa Sensors.\n\n3. Click any location to add a Soofa Sensor.\n\n" +
-       "4. Press ' m ' to toggle map\n\n5. Press ' p ' to reset population", 0, 0, 200, 400);
+  text("Directions:\n\n1. Use scrollbars and mouse to zoom, pan, and rotate.\n\n2. Press '1-5' to randomly generate one to five Soofa sensors, respectively.\n\n3. Press '0' to delete all Soofa Sensors.\n\n4. Click any location to add a Soofa Sensor.\n\n" +
+       "5. Press ' m ' to toggle map\n\n6. Press ' p ' to reset population", 0, 0, 200, 400);
   popMatrix();
   
   //Draw Summary
