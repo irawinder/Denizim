@@ -9,6 +9,7 @@ class Field {
   PVector boundary;
   
   float BUFFER = 50; // feet
+  float POPULATION = 500;
   
   // Objects for importing data files such as CSVs and Graphics
   PImage map;
@@ -161,7 +162,7 @@ class Field {
     int random_waypoint;
     float random_speed;
     Path random;
-    for (int i=0; i<1000; i++) {
+    for (int i=0; i<POPULATION; i++) {
       random = paths.get( int(random(paths.size())) );
       if (random.waypoints.size() > 1) {
         random_waypoint = int(random(random.waypoints.size()));
@@ -177,7 +178,7 @@ class Field {
             p.numDetects = 1;
           }
         }
-        if (i>950) p.pathFinding = false;
+        if (i>0.95*POPULATION) p.pathFinding = false;
         people.add(p);
       }
     }
@@ -313,18 +314,16 @@ class Field {
       popMatrix();
     }
     
-    if (blockEditing) {
-      // Draw Graph
-      tint(255, 50);
-      image(network.img, 0, 0);
-      tint(255, 255);
+    // Draw Graph
+    tint(255, 50);
+    image(network.img, 0, 0);
+    tint(255, 255);
     
-      // Draw Path
-      Path path;
-      for (int i=0; i<paths.size(); i++) {
-        path = paths.get(i);
-        path.display(100, 150);
-      }
+    // Draw Path
+    Path path;
+    for (int i=0; i<paths.size(); i++) {
+      path = paths.get(i);
+      path.display(100, 25);
     }
     
     // Draw People
@@ -347,7 +346,7 @@ class Field {
           col = color(150 - 50*vis, 255, 255);
           scale = 1.5;
         } else {
-          col = color(255, baseAlpha);
+          col = color(255, 2*baseAlpha);
           scale = 1.0;
         }
         
@@ -400,13 +399,11 @@ class Field {
     }
     
     // Draw Cursor
-    if (blockEditing) {
-      pushMatrix();
-      translate(1.2*mouseX, 1.2*mouseY, 10);
-      fill(lnColor);
-      sphere(5);
-      popMatrix();
-    }
+    pushMatrix();
+    translate(boundary.x*float(mouseX)/width, boundary.y*float(mouseY)/height, 10);
+    fill(lnColor);
+    sphere(5);
+    popMatrix();
     
   }
 }

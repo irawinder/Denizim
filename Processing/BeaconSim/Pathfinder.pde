@@ -203,19 +203,19 @@ class Graph {
     Node n;
     for (int i=0; i<nodes.size(); i++) {
       n = nodes.get(i);
-      //img.ellipse(n.loc.x, n.loc.y, SCALE, SCALE);
+      img.ellipse(n.loc.x, n.loc.y, SCALE, SCALE);
     }
     
-    // Draws Edges that Connect Nodes
-    //
-    int neighbor;
-    for (int i=0; i<nodes.size(); i++) {
-      for (int j=0; j<nodes.get(i).adj_ID.size(); j++) {
-        neighbor = nodes.get(i).adj_ID.get(j);
-        img.line(nodes.get(i).loc.x, nodes.get(i).loc.y, nodes.get(neighbor).loc.x, nodes.get(neighbor).loc.y);
-      }
-    }
-    img.endDraw();
+    //// Draws Edges that Connect Nodes
+    ////
+    //int neighbor;
+    //for (int i=0; i<nodes.size(); i++) {
+    //  for (int j=0; j<nodes.get(i).adj_ID.size(); j++) {
+    //    neighbor = nodes.get(i).adj_ID.get(j);
+    //    img.line(nodes.get(i).loc.x, nodes.get(i).loc.y, nodes.get(neighbor).loc.x, nodes.get(neighbor).loc.y);
+    //  }
+    //}
+    //img.endDraw();
   }
 }
 
@@ -258,8 +258,8 @@ class Path {
     // Draw Shortest Path
     //
     noFill();
-    strokeWeight(2);
-    stroke(#00FF00, alpha); // Green
+    strokeWeight(3);
+    stroke(255, alpha); // Green
     PVector n1, n2;
     for (int i=1; i<waypoints.size(); i++) {
       n1 = waypoints.get(i-1);
@@ -267,11 +267,12 @@ class Path {
       line(n1.x, n1.y, n2.x, n2.y);
     }
     
-    // Draw Origin (Red) and Destination (Blue)
+    // Draw Origin (Yellow) and Destination (Blue)
     //
-    fill(#FF0000); // Red
+    strokeWeight(2);
+    stroke(#FFFF00, 4*alpha); // Yellow
     ellipse(origin.x, origin.y, diameter, diameter);
-    fill(#0000FF); // Blue
+    stroke(#0000FF, 4*alpha); // Blue
     ellipse(destination.x, destination.y, diameter, diameter);
     
     strokeWeight(1);

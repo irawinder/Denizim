@@ -319,20 +319,20 @@ void mousePressed() {
 
 void mouseClicked() {
   Field f = city.get(cityIndex);
+  float fieldX = f.boundary.x*float(mouseX)/width;
+  float fieldY = f.boundary.y*float(mouseY)/height;
   
   if (f.blockEditing) {
     Block b;
-    b = new Block(1.2*mouseX, 1.2*mouseY, 50, 50, 0);
+    b = new Block(fieldX, fieldY, 50, 50, 0);
     f.blocks.add(b);
     if (f.blocks.size() > 1) {
       f.selectedBlock = f.blocks.size()-1;
     }
+  } else {
+    Sensor s = new Sensor(fieldX, fieldY);
+    f.beacons.add(s);
   }
-  
-  //if (f.fenceEditing) {
-  //  f.site.x = 1.2*mouseX;
-  //  f.site.y = 1.2*mouseY;
-  //}
 }
 
 void mouseMoved() {
