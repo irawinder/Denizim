@@ -219,6 +219,65 @@ class Graph {
   }
 }
 
+
+// Specifies a Path Object (a sequence of points)
+//
+class Path {
+  PVector origin;
+  PVector destination;
+  ArrayList<PVector> waypoints;
+  boolean enableFinder = true;
+  float diameter = 10;
+  
+  Path(float x, float y, float l, float w) {
+    origin = new PVector( random(x, x+l), random(y, y+w) );
+    destination = new PVector( random(x, x+l), random(y, y+w) );
+    waypoints = new ArrayList<PVector>();
+    straightPath();
+  }
+  
+  Path(PVector o, PVector d) {
+    origin = o;
+    destination = d;
+    waypoints = new ArrayList<PVector>();
+    straightPath();
+  }
+  
+  void solve(Pathfinder finder) {
+    waypoints = finder.findPath(origin, destination, enableFinder);
+    diameter = finder.network.SCALE;
+  }
+  
+  void straightPath() {
+    waypoints.clear();
+    waypoints.add(origin);
+    waypoints.add(destination);
+  }
+  
+  void display(int col, int alpha) {
+    // Draw Shortest Path
+    //
+    noFill();
+    strokeWeight(2);
+    stroke(#00FF00, alpha); // Green
+    PVector n1, n2;
+    for (int i=1; i<waypoints.size(); i++) {
+      n1 = waypoints.get(i-1);
+      n2 = waypoints.get(i);
+      line(n1.x, n1.y, n2.x, n2.y);
+    }
+    
+    // Draw Origin (Red) and Destination (Blue)
+    //
+    fill(#FF0000); // Red
+    ellipse(origin.x, origin.y, diameter, diameter);
+    fill(#0000FF); // Blue
+    ellipse(destination.x, destination.y, diameter, diameter);
+    
+    strokeWeight(1);
+  }
+}
+
 // The Pathfinder class allows one to the retreive a path (ArrayList<PVector>) that
 // describes an optimal route.  The Pathfinder must be initialized as a graph (i.e. a network of nodes and edges).
 // An ObstacleCourse object may be used to customize the Pathfinder Graph
@@ -868,17 +927,17 @@ class Agent {
     return steer;
   }
   
-  PVector separate(ArrayList<Agent> agents){
+  PVector separate(ArrayList<PVector> others){
     float desiredseparation = 0.5 * r;
     PVector sum = new PVector();
     int count = 0;
     
-    for(Agent other : agents) {
-      float d = PVector.dist(location, other.location);
+    for(PVector location : others) {
+      float d = PVector.dist(location, location);
       
       if ((d > 0 ) && (d < desiredseparation)){
         
-        PVector diff = PVector.sub(location, other.location);
+        PVector diff = PVector.sub(location, location);
         diff.normalize();
         diff.div(d);
         sum.add(diff);
@@ -914,10 +973,10 @@ class Agent {
     return point_index;
   }
   
-  void update(ArrayList<Agent> agents, boolean collisionDetection) {
+  void update(ArrayList<PVector> others, boolean collisionDetection) {
     
     // Apply Repelling Force
-    PVector separateForce = separate(agents);
+    PVector separateForce = separate(others);
     if (collisionDetection) {
       separateForce.mult(3);
       acceleration.add(separateForce);

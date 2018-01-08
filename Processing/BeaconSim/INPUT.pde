@@ -322,10 +322,10 @@ void mouseClicked() {
   
   if (f.blockEditing) {
     Block b;
-    b = new Block(1.2*mouseX, 1.2*mouseY, 50, 50, 50);
+    b = new Block(1.2*mouseX, 1.2*mouseY, 50, 50, 0);
     f.blocks.add(b);
     if (f.blocks.size() > 1) {
-      f.selectedBlock++;
+      f.selectedBlock = f.blocks.size()-1;
     }
   }
   
@@ -355,8 +355,11 @@ void keyPressed() {
     if (f.blocks.size() > 0) {
       Block b = f.blocks.get(f.selectedBlock);
       switch(key) {
-        case 'n':
+        case ']':
           f.nextBlock();
+          break;
+        case '[':
+          f.lastBlock();
           break;
         case 'd':
           f.removeBlock();

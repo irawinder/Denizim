@@ -18,15 +18,15 @@ class Field {
   int selectedFence = 0;
   boolean fenceEditing = false;
   
-  // Objects to define and capture specific origins, destiantions, and paths
-  ArrayList<Path> paths;
-  int selectedPath = 0;
-  boolean pathEditing = false;
-  
   // Block objects in our field
   ArrayList<Block> blocks;
   int selectedBlock = 0;
   boolean blockEditing = false;
+  
+  // Objects to define and capture specific origins, destiantions, and paths
+  ArrayList<Path> paths;
+  int selectedPath = 0;
+  boolean pathEditing = false;
   
   // Network Objects
   ObstacleCourse course;
@@ -34,20 +34,82 @@ class Field {
   Pathfinder finder;
   
   void initEnvironment() {
+    // Rectangular Building Forms
+    //
+    blocks = new ArrayList<Block>();
+    //loadBlocks("0/millspark_buildings.tsv");
+    loadBlocks("0/blockTable.tsv");
+    
+    // An obstacle Course Based Upon Building Footprints
+    //
+    course = new ObstacleCourse();
+    Obstacle o;
+    PVector[] corners = new PVector[4];
+    for (Block bld: blocks) {
+      corners[0] = new PVector(bld.loc.x - bld.l/2, bld.loc.y - bld.w/2);
+      corners[1] = new PVector(bld.loc.x + bld.l/2, bld.loc.y - bld.w/2);
+      corners[2] = new PVector(bld.loc.x + bld.l/2, bld.loc.y + bld.w/2);
+      corners[3] = new PVector(bld.loc.x - bld.l/2, bld.loc.y + bld.w/2);
+      o = new Obstacle(corners);
+      course.addObstacle(o);
+    }
+    
     // A gridded network of width x height (pixels) and node resolution (pixels)
     //
     int nodeResolution = 10;  // pixels
     int graphWidth = int(boundary.x);   // pixels
     int graphHeight = int(boundary.y); // pixels
     network = new Graph(graphWidth, graphHeight, nodeResolution);
-    network.cullRandom(0.5); 
+    network.cullRandom(0.0); // Randomly eliminates 10% of the nodes in the network
+    network.applyObstacleCourse(course);
     
-    // Randomly eliminates 50% of the nodes in the network
     // An example pathfinder object used to derive the shortest path
     // setting enableFinder to "false" will bypass the A* algorithm
     // and return a result akin to "as the bird flies"
     //
     finder = new Pathfinder(network);
+    
+    // Rectangular Geo-fences
+    //
+    fences = new ArrayList<Fence>();
+    Fence fen;
+    fen = new Fence(0, 0, boundary.x, boundary.y);
+    fences.add(fen);
+    fen = new Fence(0.5*boundary.x, 0.32*boundary.y, 0.25*boundary.x, 0.30*boundary.y);
+    fences.add(fen);
+    
+    // Valid Pathways
+    //
+    paths = new ArrayList<Path>();
+    Path p;
+    PVector origin, destination;
+    int side1, side2;
+    for (int i=0; i<100; i++) {
+      side1 = int(random(4));
+      side2 = int(random(4));
+      if (side1 == 0) {
+        origin = new PVector(0 - 2*BUFFER, random(boundary.y));
+      } else if (side1 == 1) {
+        origin = new PVector(boundary.x + 2*BUFFER, random(boundary.y));
+      } else if (side1 == 2) {
+        origin = new PVector(random(boundary.x), 0 - 2*BUFFER);
+      } else {
+        origin = new PVector(random(boundary.x), boundary.y + 2*BUFFER);
+      }
+      if (side2 == 0) {
+        destination = new PVector(0 - 2*BUFFER, random(boundary.y));
+      } else if (side2 == 1) {
+        destination = new PVector(boundary.x + 2*BUFFER, random(boundary.y));
+      } else if (side2 == 2) {
+        destination = new PVector(random(boundary.x), 0 - 2*BUFFER);
+      } else {
+        destination = new PVector(random(boundary.x), boundary.y + 2*BUFFER);
+      }
+      p = new Path(origin, destination);
+      p.solve(finder);
+      paths.add(p);
+    }
+    
   }
   
   // Sensor objects in our field
@@ -60,29 +122,8 @@ class Field {
   
   Field(float l, float w, float h, PImage img) {
     boundary = new PVector(l, w, h);
+    
     initEnvironment();
-    
-    paths = new ArrayList<Path>();
-    Path p;
-    for (int i=0; i<20; i++) {
-      p = new Path(0, 0, l, w);
-      p.solvePath(finder);
-      paths.add(p);
-    }
-    
-    fences = new ArrayList<Fence>();
-    Fence fen;
-    fen = new Fence(0.26*boundary.x, 0.32*boundary.y, 0.50*boundary.x, 0.38*boundary.y);
-    //fen = new Fence(0, 0, l, w);
-    fences.add(fen);
-    
-    blocks = new ArrayList<Block>();
-    Block b;
-    for (int i=0; i<0; i++) {
-      b = new Block();
-      b.randomize(boundary.x, boundary.y, 50, 100);
-      blocks.add(b);
-    }
     
     people = new ArrayList<Person>();
     randomizePeople();
@@ -111,19 +152,34 @@ class Field {
   
   void randomizePeople() {
     people.clear();
+    
     Person p;
-    Fence fen = fences.get(0);
-    for (int i=0; i<900; i++) {
-      p = new Person();
-      p.randomize(fen.x, fen.y, fen.l, fen.w);
-      if (random(1.0) < 0.1) {
-        if (freezeVisitCounter) {
-          p.numDetects = 2;
-        } else {
-          p.numDetects = 1;
+    Fence fen = fences.get(1);
+     //  Add Random Pathfinders
+    //
+    PVector loc;
+    int random_waypoint;
+    float random_speed;
+    Path random;
+    for (int i=0; i<1000; i++) {
+      random = paths.get( int(random(paths.size())) );
+      if (random.waypoints.size() > 1) {
+        random_waypoint = int(random(random.waypoints.size()));
+        random_speed = random(0.1, 0.3);
+        loc = random.waypoints.get(random_waypoint);
+        p = new Person(loc.x, loc.y, random_speed, random.waypoints);
+        p.randomize(fen.x, fen.y, fen.l, fen.w);
+        // sets sensor counter randomly
+        if (random(1.0) < 0.1) {
+          if (freezeVisitCounter) {
+            p.numDetects = 2;
+          } else {
+            p.numDetects = 1;
+          }
         }
+        if (i>950) p.pathFinding = false;
+        people.add(p);
       }
-      people.add(p);
     }
   }
   
@@ -132,6 +188,14 @@ class Field {
       selectedBlock = 0;
     } else {
       selectedBlock++;
+    }
+  }
+  
+  void lastBlock() {
+    if (selectedBlock == 0) {
+      selectedBlock = blocks.size() - 1;
+    } else {
+      selectedBlock--;
     }
   }
   
@@ -207,6 +271,7 @@ class Field {
       // Draw Ground Map
       tint(255, 255 - baseAlpha);
       image(map, 0, 0, boundary.x, boundary.y);
+      tint(255, 255);
     }
     popMatrix();
     
@@ -220,22 +285,47 @@ class Field {
       popMatrix();
     }
     
-    // Draw Buildings
+    // Draw Buildings and Streets
     for(int i=0; i<blocks.size(); i++) {
       Block b = blocks.get(i);
       pushMatrix();
       translate(b.loc.x, b.loc.y, b.h/2);
-      if (i == selectedBlock && blockEditing) {
-        fill(#FFFF00, 2*baseAlpha);
+      if (b.h > 0) {
+        noStroke();
+        if (i == selectedBlock && blockEditing) {
+          fill(#FFFF00, 2*baseAlpha);
+        } else {
+          fill(b.col, 2*baseAlpha);
+        }
       } else {
-        fill(b.col, 2*baseAlpha);
+        noFill();
+        if (i == selectedBlock && blockEditing) {
+          stroke(#FFFF00, 2*baseAlpha);
+        } else {
+          stroke(b.col, 2*baseAlpha);
+        }
       }
-      box(b.l, b.w, b.h);
+      if (blockEditing || b.h > 0 ) {
+        box(b.l, b.w, b.h);
+      }
+      fill(255);
+      noStroke();
       popMatrix();
     }
     
-    // Draw Graph
-    image(network.img, 0, 0);
+    if (blockEditing) {
+      // Draw Graph
+      tint(255, 50);
+      image(network.img, 0, 0);
+      tint(255, 255);
+    
+      // Draw Path
+      Path path;
+      for (int i=0; i<paths.size(); i++) {
+        path = paths.get(i);
+        path.display(100, 150);
+      }
+    }
     
     // Draw People
     for(Person p: people) {
@@ -268,11 +358,13 @@ class Field {
         fadeVal = 1 - max(fadeX, fadeY) / BUFFER;
         
         // Apply Fade, Color, and Draw Person
+        noStroke();
         if (fadeVal > 0) {
           fill(col, fadeVal*255);
         } else {
           fill(col);
         }
+        //if (!p.pathFinding) fill(#FF0000);
         box(scale*p.l, scale*p.w, scale*p.h);
         
         popMatrix();
@@ -281,14 +373,8 @@ class Field {
     
     float beaconFade = sq(1 - float(frameCounter) / PING_FREQ);
     
-    // Draw Path
-    Path p;
-    for (int i=0; i<paths.size(); i++) {
-      p = paths.get(i);
-      p.display(100, 150);
-    }
-    
     // Draw Beacon Min Range
+    hint(DISABLE_DEPTH_TEST);
     for(Sensor s: beacons) {
       pushMatrix();
       translate(s.loc.x, s.loc.y, -5);
@@ -302,7 +388,6 @@ class Field {
     
     // Draw Beacon Max Range
     if (beaconFade > 0.1) {
-      hint(DISABLE_DEPTH_TEST);
       for(Sensor s: beacons) {
         pushMatrix();
         translate(s.loc.x, s.loc.y, 0);
@@ -326,7 +411,7 @@ class Field {
   }
 }
 
-class Person {
+class Person extends Agent {
   PVector loc, vel, acc;
   float l, w, h; // length, width, and height
   float MAX_SPEED = 15.0; // pixels per second
@@ -334,9 +419,10 @@ class Person {
   boolean detected = false;
   int numDetects;
   
-  Agent intel;
+  boolean pathFinding = true;
   
-  Person() {
+  Person(float x, float y, float max_speed, ArrayList<PVector> waypoints) {
+    super(x, y, 5, max_speed, waypoints);
     loc = new PVector(0, 0);
     vel = new PVector(0, 0);
     acc = new PVector(0, 0);
@@ -351,10 +437,6 @@ class Person {
     } else {
       numDetects = 0;
     }
-    
-    //int random_index = int(random(path.size()-1));
-    //float random_speed = random(0.1, 0.3);
-    //intel = new Agent(loc.x, loc.y, 5, random_speed, path);
   }
   
   void randomize(float x, float y, float l, float w) {
@@ -364,24 +446,42 @@ class Person {
   }
   
   void update(Field f) {
-    //acc = new PVector(random(-1, 1), random(-1, 1));
-    //acc.setMag(random(-0.1, 0.1));
-    acc.x += random(-1, 1);
-    acc.y += random(-1, 1);
-    vel.add(acc);
-    if (vel.mag() > MAX_SPEED) vel.setMag(MAX_SPEED);
-    loc.add(vel);
     
-    Fence fen = f.fences.get(0);
-    if (loc.x < fen.x - f.BUFFER) 
-      loc.x = fen.x + fen.l + f.BUFFER;
-    if (loc.x > fen.x + fen.l + f.BUFFER) 
-      loc.x = fen.x - f.BUFFER;
-    if (loc.y < fen.y - f.BUFFER) 
-      loc.y = fen.y + fen.w + f.BUFFER;
-    if (loc.y > fen.y + fen.w + f.BUFFER) 
-      loc.y = fen.y - f.BUFFER;
+    //  Default Wandering Behavior
+    //
+    if (!pathFinding) {
+      //  Accelerate in Random Direction
+      //
+      acc.x += random(-1, 1);
+      acc.y += random(-1, 1);
+      vel.add(acc);
+      if (vel.mag() > MAX_SPEED) vel.setMag(MAX_SPEED);
+      loc.add(vel);
+      
+      //  Agents that wander off of their border teleport to opposite border
+      //
+      Fence fen = f.fences.get(1);
+      if (loc.x < fen.x - f.BUFFER) 
+        loc.x = fen.x + fen.l + f.BUFFER;
+      if (loc.x > fen.x + fen.l + f.BUFFER) 
+        loc.x = fen.x - f.BUFFER;
+      if (loc.y < fen.y - f.BUFFER) 
+        loc.y = fen.y + fen.w + f.BUFFER;
+      if (loc.y > fen.y + fen.w + f.BUFFER) 
+        loc.y = fen.y - f.BUFFER;  
+    } else {
+      loc.x = location.x;
+      loc.y = location.y;
+    }
   }
+}
+
+ArrayList<PVector> personLocations(ArrayList<Person> people) {
+  ArrayList<PVector> l = new ArrayList<PVector>();
+  for (Person p: people) {
+    l.add(p.location);
+  }
+  return l;
 }
 
 class Sensor {
@@ -485,61 +585,3 @@ class Fence {
     this.w = w;
   }
 }
-
-// Specifies a path condition for People Agents
-class Path {
-  PVector origin;
-  PVector destination;
-  ArrayList<PVector> nodes;
-  boolean enableFinder = true;
-  
-  Path(float x, float y, float l, float w) {
-    origin = new PVector( random(x, x+l), random(y, y+w) );
-    destination = new PVector( random(x, x+l), random(y, y+w) );
-    nodes = new ArrayList<PVector>();
-    straightPath();
-  }
-  
-  Path(PVector o, PVector d) {
-    origin = o;
-    destination = d;
-    nodes = new ArrayList<PVector>();
-    straightPath();
-  }
-  
-  void solvePath(Pathfinder f) {
-    nodes = f.findPath(origin, destination, enableFinder);
-  }
-  
-  void straightPath() {
-    nodes.clear();
-    nodes.add(origin);
-    nodes.add(destination);
-  }
-  
-  void display(int col, int alpha) {
-    Field f = city.get(cityIndex);
-
-    // Draw Shortest Path
-    //
-    noFill();
-    strokeWeight(2);
-    stroke(#00FF00, alpha); // Green
-    PVector n1, n2;
-    for (int i=1; i<nodes.size(); i++) {
-      n1 = nodes.get(i-1);
-      n2 = nodes.get(i);
-      line(n1.x, n1.y, n2.x, n2.y);
-    }
-    
-    // Draw Origin (Red) and Destination (Blue)
-    //
-    stroke(#FF0000, alpha); // Red
-    ellipse(origin.x, origin.y, f.network.SCALE, f.network.SCALE);
-    stroke(#0000FF, alpha); // Blue
-    ellipse(destination.x, destination.y, f.network.SCALE, f.network.SCALE);
-    
-    strokeWeight(1);
-  }
-}
-  

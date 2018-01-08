@@ -62,6 +62,7 @@ void draw() {
   Field f = city.get(cityIndex);
   
   for (Person p: f.people) {
+    p.update(personLocations(f.people), true);
     p.update(f);
     
     if (frameCounter == 0) {
@@ -82,8 +83,6 @@ void draw() {
       }
     }
   }
-  
-  
   
   // Draw 3D Graphics
   draw3D(f);
