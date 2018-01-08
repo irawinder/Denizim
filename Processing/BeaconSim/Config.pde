@@ -1,11 +1,13 @@
 // Global Constants and Configuration for Application
 
 int frameCounter = 0;
+int popCounter = 0;
+int POP_RESET = 10000;
 
 // Frame Delay between each sensor ping
 int PING_FREQ = 4*60;
 
-boolean freezeVisitCounter = true;
+boolean freezeVisitCounter = false;
 
 // Fraction of screen height to use as margin
 float MARGIN = 0.03;
@@ -13,7 +15,7 @@ float MARGIN = 0.03;
 // Default color for lines, text, etc
 int lnColor = 255;  // (0-255)
 // Default background color
-int bgColor = 0;    // (0-255)
+int bgColor = 20;    // (0-255)
 // Default baseline alpha value
 int baseAlpha = 50; // (0-255)
 // Default Grass Color

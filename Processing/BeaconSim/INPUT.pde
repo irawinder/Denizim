@@ -69,7 +69,7 @@ class HScrollbar {
     ratio = (float)sw / (float)widthtoheight;
     xpos = xp;
     ypos = yp-sheight/2;
-    spos = swidth/2;
+    spos = xpos + swidth/2 - sheight/2;
     newspos = spos;
     sposMin = xpos;
     sposMax = xpos + swidth - sheight;
@@ -91,7 +91,7 @@ class HScrollbar {
     if (locked) {
       newspos = constrain(mouseX-sheight/2, sposMin, sposMax);
     }
-    if (abs(newspos - spos) > 1) {
+    if (abs(newspos - spos) > 0.05) {
       spos = spos + (newspos-spos)/loose;
     }
   }
@@ -111,14 +111,17 @@ class HScrollbar {
 
   void display() {
     noStroke();
-    fill(204, uiFade*baseAlpha);
+    fill(204, baseAlpha);
     rect(xpos, ypos, swidth, sheight, sheight);
     if (over || locked) {
-      fill(lnColor, uiFade*baseAlpha);
+      fill(lnColor, baseAlpha);
     } else {
-      fill(102, 102, 102, uiFade*baseAlpha);
+      fill(102, baseAlpha);
     }
     ellipse(spos + sheight/2, ypos + sheight/2, sheight, sheight);
+    fill(lnColor, 255);
+    textAlign(CENTER, BOTTOM);
+    text("ROTATION", xpos + swidth/2, ypos - 14);
   }
 
   float getPos() {
@@ -130,7 +133,7 @@ class HScrollbar {
   float getPosPI() {
     // Convert spos to be values between
     // 0 and 2PI
-    return 2 * PI * spos / float(swidth);
+    return 2 * PI * (spos-sposMin) / (swidth-sheight);
   }
 }
 
@@ -173,7 +176,7 @@ class VScrollbar {
     if (locked) {
       newspos = constrain(mouseY-swidth/2, sposMin, sposMax);
     }
-    if (abs(newspos - spos) > 1) {
+    if (abs(newspos - spos) > 0.05) {
       spos = spos + (newspos-spos)/loose;
     }
   }
@@ -193,26 +196,23 @@ class VScrollbar {
 
   void display() {
     noStroke();
-    fill(204, uiFade*baseAlpha);
+    fill(204, 2*baseAlpha);
     rect(xpos, ypos, swidth, sheight, swidth);
     if (over || locked) {
-      fill(lnColor, uiFade*baseAlpha);
+      fill(lnColor, 2*baseAlpha);
     } else {
-      fill(102, 102, 102, uiFade*baseAlpha);
+      fill(102, 4*baseAlpha);
     }
     ellipse(xpos + swidth/2, spos + swidth/2, swidth, swidth);
+    fill(lnColor, 255);
+    textAlign(CENTER, TOP);
+    text("ZOOM", xpos + swidth/2, ypos + sheight + 21);
   }
 
   float getPos() {
     // Convert spos to be values between
     // 0 and the total width of the scrollbar
     return spos * ratio;
-  }
-  
-  float getPosPI() {
-    // Convert spos to be values between
-    // 0 and 2PI
-    return 2 * PI * spos / float(sheight);
   }
   
   float getPosZoom() {
@@ -324,8 +324,8 @@ void mousePressed() {
 
 void mouseClicked() {
   Field f = city.get(cityIndex);
-  float fieldX = f.boundary.x*float(mouseX)/width;
-  float fieldY = f.boundary.y*float(mouseY)/height;
+  float fieldX = f.boundary.x*(mouseX - 0.25*width)/(0.5*width); 
+  float fieldY = f.boundary.y*(mouseY - 0.15*height)/(0.7*height);
   
   if (f.blockEditing) {
     Block b;
@@ -346,6 +346,9 @@ void mouseMoved() {
 }
 
 void keyPressed() {
+  uiFade = 1.0;
+  fadeTimer = FADE_TIMER;
+  
   Field f = city.get(cityIndex);
   
   if (f.blockEditing) {
@@ -442,27 +445,31 @@ void keyPressed() {
     case 'p':
       f.randomizePeople();
       break;
-    case 'i':
-      initFields();
-      break;
+    //case 'i':
+    //  initFields();
+    //  break;
     case 'm':
       drawMap = !drawMap;
+      f.showPaths = !f.showPaths;
       break;
-    case 'B':
-      f.blockEditing = !f.blockEditing;
-      println("Editing Blocks: " + f.blockEditing);
-      break;
-    case 'F':
-      f.fenceEditing = !f.fenceEditing;
-      println("Editing Fences: " + f.fenceEditing);
-      break;
+    //case 'B':
+    //  f.blockEditing = !f.blockEditing;
+    //  println("Editing Blocks: " + f.blockEditing);
+    //  break;
+    //case 'F':
+    //  f.fenceEditing = !f.fenceEditing;
+    //  println("Editing Fences: " + f.fenceEditing);
+    //  break;
+    //case 'f':
+    //  f.showPaths = !f.showPaths;
+    //  break;
   }
 }
 
 // resets and centers camera view
 void resetControls() {
-  hs.newspos = hs.swidth/2;
-  vs.newspos = 0.2*vs.sheight;
+  hs.newspos = hs.xpos + hs.swidth/2 - hs.sheight/2;
+  vs.newspos = vs.sposMin + 0.1*vs.sheight;
   drag.x_offset = 0;
   drag.y_offset = 0;
   drag.camX_init = CAMX_DEFAULT;

@@ -25,6 +25,7 @@ class Field {
   boolean blockEditing = false;
   
   // Objects to define and capture specific origins, destiantions, and paths
+  boolean showPaths = false;
   ArrayList<Path> paths;
   int selectedPath = 0;
   boolean pathEditing = false;
@@ -253,12 +254,14 @@ class Field {
   void render() {
     
     // Draw Bounding Box
-    stroke(lnColor, 0.5*baseAlpha*uiFade);
-    noFill();
-    pushMatrix();
-    translate(0.5*boundary.x, 0.5*boundary.y, 0.5*boundary.z);
-    box(boundary.x, boundary.y, boundary.z);
-    popMatrix();
+    if (showPaths) {
+      stroke(lnColor, 0.5*baseAlpha*uiFade);
+      noFill();
+      pushMatrix();
+      translate(0.5*boundary.x, 0.5*boundary.y, 0.5*boundary.z);
+      box(boundary.x, boundary.y, boundary.z);
+      popMatrix();
+    }
     
     // Draw Ground
     pushMatrix();
@@ -284,46 +287,6 @@ class Field {
       fill(s.col);
       sphere(s.DIAM);
       popMatrix();
-    }
-    
-    // Draw Buildings and Streets
-    for(int i=0; i<blocks.size(); i++) {
-      Block b = blocks.get(i);
-      pushMatrix();
-      translate(b.loc.x, b.loc.y, b.h/2);
-      if (b.h > 0) {
-        noStroke();
-        if (i == selectedBlock && blockEditing) {
-          fill(#FFFF00, 2*baseAlpha);
-        } else {
-          fill(b.col, 2*baseAlpha);
-        }
-      } else {
-        noFill();
-        if (i == selectedBlock && blockEditing) {
-          stroke(#FFFF00, 2*baseAlpha);
-        } else {
-          stroke(b.col, 2*baseAlpha);
-        }
-      }
-      if (blockEditing || b.h > 0 ) {
-        box(b.l, b.w, b.h);
-      }
-      fill(255);
-      noStroke();
-      popMatrix();
-    }
-    
-    // Draw Graph
-    tint(255, 50);
-    image(network.img, 0, 0);
-    tint(255, 255);
-    
-    // Draw Path
-    Path path;
-    for (int i=0; i<paths.size(); i++) {
-      path = paths.get(i);
-      path.display(100, 25);
     }
     
     // Draw People
@@ -370,6 +333,48 @@ class Field {
       }
     }
     
+    // Draw Buildings and Streets
+    for(int i=0; i<blocks.size(); i++) {
+      Block b = blocks.get(i);
+      pushMatrix();
+      translate(b.loc.x, b.loc.y, b.h/2);
+      if (b.h > 0) {
+        noStroke();
+        if (i == selectedBlock && blockEditing) {
+          fill(#FFFF00, 2*baseAlpha);
+        } else {
+          fill(b.col, 2*baseAlpha);
+        }
+      } else {
+        noFill();
+        if (i == selectedBlock && blockEditing) {
+          stroke(#FFFF00, 2*baseAlpha);
+        } else {
+          stroke(b.col, 2*baseAlpha);
+        }
+      }
+      if (blockEditing || b.h > 0 ) {
+        box(b.l, b.w, b.h);
+      }
+      fill(255);
+      noStroke();
+      popMatrix();
+    }
+    
+    if (showPaths) {
+      // Draw Graph
+      tint(255, 50);
+      image(network.img, 0, 0);
+      tint(255, 255);
+      
+      // Draw Path
+      Path path;
+      for (int i=0; i<paths.size(); i++) {
+        path = paths.get(i);
+        path.display(100, 25);
+      }
+    }
+    
     float beaconFade = sq(1 - float(frameCounter) / PING_FREQ);
     
     // Draw Beacon Min Range
@@ -379,8 +384,13 @@ class Field {
       translate(s.loc.x, s.loc.y, -5);
       noStroke();
       if (beaconFade > 0.1) {
-        fill(lnColor, beaconFade*baseAlpha);
-        sphere(2*s.MIN_RANGE);
+        //fill(lnColor, beaconFade*baseAlpha);
+        //sphere(2*s.MIN_RANGE*(1-beaconFade));
+        noFill();
+        stroke(lnColor, beaconFade*baseAlpha);
+        strokeWeight(2);
+        ellipse(0, 0, 2*s.MIN_RANGE, 2*s.MIN_RANGE);
+        strokeWeight(1);
       }
       popMatrix();
     }
@@ -390,9 +400,10 @@ class Field {
       for(Sensor s: beacons) {
         pushMatrix();
         translate(s.loc.x, s.loc.y, 0);
-        noStroke();
-        fill(lnColor, beaconFade*0.5*baseAlpha);
-        ellipse(0, 0, 2*s.MAX_RANGE, 2*s.MAX_RANGE);
+        //noStroke();
+        //fill(lnColor, beaconFade*0.5*baseAlpha);
+        stroke(lnColor, beaconFade*baseAlpha);
+        ellipse(0, 0, 2*(s.MAX_RANGE-s.MIN_RANGE)*(1-beaconFade) + 2*s.MIN_RANGE, 2*(s.MAX_RANGE-s.MIN_RANGE)*(1-beaconFade) + 2*s.MIN_RANGE);
         popMatrix();
       }
       hint(ENABLE_DEPTH_TEST);
@@ -400,7 +411,7 @@ class Field {
     
     // Draw Cursor
     pushMatrix();
-    translate(boundary.x*float(mouseX)/width, boundary.y*float(mouseY)/height, 10);
+    translate(boundary.x*(mouseX - 0.25*width)/(0.5*width), boundary.y*(mouseY - 0.15*height)/(0.7*height), 10);
     fill(lnColor);
     sphere(5);
     popMatrix();
