@@ -44,11 +44,11 @@ void setup() {
   initCamera();
   
   // Initialize Horizontal Scrollbar
-  hs = new HScrollbar(width - int(height*MARGIN) - int(0.3*height), int((1-2*MARGIN)*height), int(0.3*height), int(MARGIN*height), 5);
+  hs = new HScrollbar(width - int(height*MARGIN) - int(0.3*height), int((1-1.5*MARGIN)*height), int(0.3*height), int(MARGIN*height), 5);
   camRotation = hs.getPosPI(); // (0 - 2*PI)
   
   // Initialize Vertical Scrollbar
-  vs = new VScrollbar(width - int(2*MARGIN*height), int(MARGIN*height), int(MARGIN*height), int(0.3*height), 5);
+  vs = new VScrollbar(width - int(1.5*MARGIN*height), int(MARGIN*height), int(MARGIN*height), int(0.3*height), 5);
   
   // Initialize Drag Funciton
   drag = new XYDrag(1.0, 7, 5, 5, width - 10, int(0.85*height) - 5);
@@ -104,6 +104,7 @@ void draw() {
       }
     }
     visitors.addReading(reading);
+    visitors.updateMax(f.people.size());
   }
   
   // Draw 3D Graphics
@@ -148,6 +149,7 @@ void draw2D() {
   text("Press 'r' to reset camera position", 0, 0);
   translate(0, height - 2*MARGIN*height);
   textAlign(CENTER, BOTTOM);
+  fill(lnColor, baseAlpha);
   text("Copyright 2018 Ira Winder and Changing Environments", 0, 0);
   popMatrix();
   

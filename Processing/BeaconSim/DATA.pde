@@ -80,6 +80,10 @@ class RunningGraph {
     }
   }
   
+  void updateMax(float max) {
+    MAX_VALUE = max;
+  }
+  
   void display() {
     float beaconFade = sq(1 - float(frameCounter) / PING_FREQ);
     

@@ -9,7 +9,7 @@ class Field {
   PVector boundary;
   
   float BUFFER = 50; // feet
-  float POPULATION = 500;
+  float POPULATION = int(random(400, 600));
   
   // Objects for importing data files such as CSVs and Graphics
   PImage map;
@@ -165,6 +165,9 @@ class Field {
     Path random;
     for (int i=0; i<POPULATION; i++) {
       random = paths.get( int(random(paths.size())) );
+      while (random.waypoints.size() <= 1) {
+        random = paths.get( int(random(paths.size())) );
+      }
       if (random.waypoints.size() > 1) {
         random_waypoint = int(random(random.waypoints.size()));
         random_speed = random(0.1, 0.3);
@@ -253,15 +256,15 @@ class Field {
   
   void render() {
     
-    // Draw Bounding Box
-    if (showPaths) {
-      stroke(lnColor, 0.5*baseAlpha*uiFade);
-      noFill();
-      pushMatrix();
-      translate(0.5*boundary.x, 0.5*boundary.y, 0.5*boundary.z);
-      box(boundary.x, boundary.y, boundary.z);
-      popMatrix();
-    }
+    //// Draw Bounding Box
+    //if (showPaths) {
+    //  stroke(lnColor, 0.5*baseAlpha*uiFade);
+    //  noFill();
+    //  pushMatrix();
+    //  translate(0.5*boundary.x, 0.5*boundary.y, 0.5*boundary.z);
+    //  box(boundary.x, boundary.y, boundary.z);
+    //  popMatrix();
+    //}
     
     // Draw Ground
     pushMatrix();
@@ -315,8 +318,9 @@ class Field {
         
         // Determine Fade
         float fadeX, fadeY, fadeVal;
-        fadeX = abs(p.loc.x - fen.x - fen.l/2) - fen.l/2;
-        fadeY = abs(p.loc.y - fen.y - fen.w/2) - fen.w/2;
+        Fence fen2 = fences.get(1);
+        fadeX = abs(p.loc.x - fen2.x - fen2.l/2) - fen2.l/2;
+        fadeY = abs(p.loc.y - fen2.y - fen2.w/2) - fen2.w/2;
         fadeVal = 1 - max(fadeX, fadeY) / BUFFER;
         
         // Apply Fade, Color, and Draw Person
@@ -411,7 +415,11 @@ class Field {
     
     // Draw Cursor
     pushMatrix();
-    translate(boundary.x*(mouseX - 0.25*width)/(0.5*width), boundary.y*(mouseY - 0.15*height)/(0.7*height), 10);
+    float fieldX = boundary.x*(mouseX - 0.25*width)/(0.5*width); 
+    float fieldY = boundary.y*(mouseY - 0.15*height)/(0.7*height);
+    fieldX = constrain(fieldX, 0, boundary.x);
+    fieldY = constrain(fieldY, 0, boundary.y);
+    translate(fieldX, fieldY, 10);
     fill(lnColor);
     sphere(5);
     popMatrix();

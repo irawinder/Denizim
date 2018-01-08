@@ -326,6 +326,8 @@ void mouseClicked() {
   Field f = city.get(cityIndex);
   float fieldX = f.boundary.x*(mouseX - 0.25*width)/(0.5*width); 
   float fieldY = f.boundary.y*(mouseY - 0.15*height)/(0.7*height);
+  fieldX = constrain(fieldX, 0, f.boundary.x);
+  fieldY = constrain(fieldY, 0, f.boundary.y);
   
   if (f.blockEditing) {
     Block b;
@@ -431,7 +433,7 @@ void keyPressed() {
         f.randomBeacons(4);
         break;
       case '5':
-        f.randomBeacons(4);
+        f.randomBeacons(5);
         break;
     }
   }
