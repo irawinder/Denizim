@@ -24,10 +24,10 @@ XYDrag drag;
 void setup() {
 
   // Run application at a specified pixel dimension
-  //size(1280, 800, P3D);
+  size(1280, 800, P3D);
   
   // Run application to match native screen resolution
-  fullScreen(P3D);
+  //fullScreen(P3D);
   
   // Sets Color Mode to Hue, Saturation, and Brightness
   colorMode(HSB);
@@ -62,6 +62,7 @@ void draw() {
   Field f = city.get(cityIndex);
   
   for (Person p: f.people) {
+    p.update(personLocations(f.people), true);
     p.update(f);
     
     if (frameCounter == 0) {
@@ -69,7 +70,7 @@ void draw() {
         for (Sensor s: f.beacons) {
           p.detected = s.detect(p.loc, p.detected);
           if (p.detected) {
-            p.numDetects++;
+            if (!freezeVisitCounter) p.numDetects++;
             break;
           }
         }
@@ -82,8 +83,6 @@ void draw() {
       }
     }
   }
-  
-  
   
   // Draw 3D Graphics
   draw3D(f);

@@ -322,12 +322,17 @@ void mouseClicked() {
   
   if (f.blockEditing) {
     Block b;
-    b = new Block(1.2*mouseX, 1.2*mouseY, 50, 50, 50);
+    b = new Block(1.2*mouseX, 1.2*mouseY, 50, 50, 0);
     f.blocks.add(b);
     if (f.blocks.size() > 1) {
-      f.selectedBlock++;
+      f.selectedBlock = f.blocks.size()-1;
     }
   }
+  
+  //if (f.fenceEditing) {
+  //  f.site.x = 1.2*mouseX;
+  //  f.site.y = 1.2*mouseY;
+  //}
 }
 
 void mouseMoved() {
@@ -350,8 +355,11 @@ void keyPressed() {
     if (f.blocks.size() > 0) {
       Block b = f.blocks.get(f.selectedBlock);
       switch(key) {
-        case 'n':
+        case ']':
           f.nextBlock();
+          break;
+        case '[':
+          f.lastBlock();
           break;
         case 'd':
           f.removeBlock();
@@ -394,6 +402,7 @@ void keyPressed() {
         }
       }
     }
+   
   } else {
     
     switch(key) {
@@ -425,6 +434,7 @@ void keyPressed() {
       break;
     case 'p':
       f.randomizePeople();
+      
       break;
     case 'i':
       initFields();
@@ -432,9 +442,13 @@ void keyPressed() {
     case 'm':
       drawMap = !drawMap;
       break;
-    case 'E':
+    case 'B':
       f.blockEditing = !f.blockEditing;
       println("Editing Blocks: " + f.blockEditing);
+      break;
+    case 'F':
+      f.fenceEditing = !f.fenceEditing;
+      println("Editing Fences: " + f.fenceEditing);
       break;
   }
 }

@@ -13,27 +13,117 @@ class Field {
   // Objects for importing data files such as CSVs and Graphics
   PImage map;
   
+  // Bounding Area(s) for Wandering Agents
+  ArrayList<Fence> fences;
+  int selectedFence = 0;
+  boolean fenceEditing = false;
+  
   // Block objects in our field
   ArrayList<Block> blocks;
   int selectedBlock = 0;
   boolean blockEditing = false;
   
-  // Person objects in our field
-  ArrayList<Person> people;
+  // Objects to define and capture specific origins, destiantions, and paths
+  ArrayList<Path> paths;
+  int selectedPath = 0;
+  boolean pathEditing = false;
+  
+  // Network Objects
+  ObstacleCourse course;
+  Graph network;
+  Pathfinder finder;
+  
+  void initEnvironment() {
+    // Rectangular Building Forms
+    //
+    blocks = new ArrayList<Block>();
+    //loadBlocks("0/millspark_buildings.tsv");
+    loadBlocks("0/blockTable.tsv");
+    
+    // An obstacle Course Based Upon Building Footprints
+    //
+    course = new ObstacleCourse();
+    Obstacle o;
+    PVector[] corners = new PVector[4];
+    for (Block bld: blocks) {
+      corners[0] = new PVector(bld.loc.x - bld.l/2, bld.loc.y - bld.w/2);
+      corners[1] = new PVector(bld.loc.x + bld.l/2, bld.loc.y - bld.w/2);
+      corners[2] = new PVector(bld.loc.x + bld.l/2, bld.loc.y + bld.w/2);
+      corners[3] = new PVector(bld.loc.x - bld.l/2, bld.loc.y + bld.w/2);
+      o = new Obstacle(corners);
+      course.addObstacle(o);
+    }
+    
+    // A gridded network of width x height (pixels) and node resolution (pixels)
+    //
+    int nodeResolution = 10;  // pixels
+    int graphWidth = int(boundary.x);   // pixels
+    int graphHeight = int(boundary.y); // pixels
+    network = new Graph(graphWidth, graphHeight, nodeResolution);
+    network.cullRandom(0.0); // Randomly eliminates 10% of the nodes in the network
+    network.applyObstacleCourse(course);
+    
+    // An example pathfinder object used to derive the shortest path
+    // setting enableFinder to "false" will bypass the A* algorithm
+    // and return a result akin to "as the bird flies"
+    //
+    finder = new Pathfinder(network);
+    
+    // Rectangular Geo-fences
+    //
+    fences = new ArrayList<Fence>();
+    Fence fen;
+    fen = new Fence(0, 0, boundary.x, boundary.y);
+    fences.add(fen);
+    fen = new Fence(0.5*boundary.x, 0.32*boundary.y, 0.25*boundary.x, 0.30*boundary.y);
+    fences.add(fen);
+    
+    // Valid Pathways
+    //
+    paths = new ArrayList<Path>();
+    Path p;
+    PVector origin, destination;
+    int side1, side2;
+    for (int i=0; i<100; i++) {
+      side1 = int(random(4));
+      side2 = int(random(4));
+      if (side1 == 0) {
+        origin = new PVector(0 - 2*BUFFER, random(boundary.y));
+      } else if (side1 == 1) {
+        origin = new PVector(boundary.x + 2*BUFFER, random(boundary.y));
+      } else if (side1 == 2) {
+        origin = new PVector(random(boundary.x), 0 - 2*BUFFER);
+      } else {
+        origin = new PVector(random(boundary.x), boundary.y + 2*BUFFER);
+      }
+      if (side2 == 0) {
+        destination = new PVector(0 - 2*BUFFER, random(boundary.y));
+      } else if (side2 == 1) {
+        destination = new PVector(boundary.x + 2*BUFFER, random(boundary.y));
+      } else if (side2 == 2) {
+        destination = new PVector(random(boundary.x), 0 - 2*BUFFER);
+      } else {
+        destination = new PVector(random(boundary.x), boundary.y + 2*BUFFER);
+      }
+      p = new Path(origin, destination);
+      p.solve(finder);
+      paths.add(p);
+    }
+    
+  }
   
   // Sensor objects in our field
   ArrayList<Sensor> beacons;
+  int selectedSensor = 0;
+  boolean sensorEditing = false;
+  
+  // Person objects in our field
+  ArrayList<Person> people;
   
   Field(float l, float w, float h, PImage img) {
     boundary = new PVector(l, w, h);
     
-    blocks = new ArrayList<Block>();
-    Block b;
-    for (int i=0; i<0; i++) {
-      b = new Block();
-      b.randomize(boundary.x, boundary.y, 50, 100);
-      blocks.add(b);
-    }
+    initEnvironment();
     
     people = new ArrayList<Person>();
     randomizePeople();
@@ -62,12 +152,34 @@ class Field {
   
   void randomizePeople() {
     people.clear();
+    
     Person p;
-    for (int i=0; i<900; i++) {
-      p = new Person();
-      p.randomize(boundary.x, boundary.y);
-      if (random(1.0) < 0.05) p.numDetects = 1;
-      people.add(p);
+    Fence fen = fences.get(1);
+     //  Add Random Pathfinders
+    //
+    PVector loc;
+    int random_waypoint;
+    float random_speed;
+    Path random;
+    for (int i=0; i<1000; i++) {
+      random = paths.get( int(random(paths.size())) );
+      if (random.waypoints.size() > 1) {
+        random_waypoint = int(random(random.waypoints.size()));
+        random_speed = random(0.1, 0.3);
+        loc = random.waypoints.get(random_waypoint);
+        p = new Person(loc.x, loc.y, random_speed, random.waypoints);
+        p.randomize(fen.x, fen.y, fen.l, fen.w);
+        // sets sensor counter randomly
+        if (random(1.0) < 0.1) {
+          if (freezeVisitCounter) {
+            p.numDetects = 2;
+          } else {
+            p.numDetects = 1;
+          }
+        }
+        if (i>950) p.pathFinding = false;
+        people.add(p);
+      }
     }
   }
   
@@ -76,6 +188,14 @@ class Field {
       selectedBlock = 0;
     } else {
       selectedBlock++;
+    }
+  }
+  
+  void lastBlock() {
+    if (selectedBlock == 0) {
+      selectedBlock = blocks.size() - 1;
+    } else {
+      selectedBlock--;
     }
   }
   
@@ -151,6 +271,7 @@ class Field {
       // Draw Ground Map
       tint(255, 255 - baseAlpha);
       image(map, 0, 0, boundary.x, boundary.y);
+      tint(255, 255);
     }
     popMatrix();
     
@@ -164,25 +285,54 @@ class Field {
       popMatrix();
     }
     
-    // Draw Buildings
+    // Draw Buildings and Streets
     for(int i=0; i<blocks.size(); i++) {
       Block b = blocks.get(i);
       pushMatrix();
       translate(b.loc.x, b.loc.y, b.h/2);
-      if (i == selectedBlock && blockEditing) {
-        fill(#FFFF00, 2*baseAlpha);
+      if (b.h > 0) {
+        noStroke();
+        if (i == selectedBlock && blockEditing) {
+          fill(#FFFF00, 2*baseAlpha);
+        } else {
+          fill(b.col, 2*baseAlpha);
+        }
       } else {
-        fill(b.col, 2*baseAlpha);
+        noFill();
+        if (i == selectedBlock && blockEditing) {
+          stroke(#FFFF00, 2*baseAlpha);
+        } else {
+          stroke(b.col, 2*baseAlpha);
+        }
       }
-      box(b.l, b.w, b.h);
+      if (blockEditing || b.h > 0 ) {
+        box(b.l, b.w, b.h);
+      }
+      fill(255);
+      noStroke();
       popMatrix();
+    }
+    
+    if (blockEditing) {
+      // Draw Graph
+      tint(255, 50);
+      image(network.img, 0, 0);
+      tint(255, 255);
+    
+      // Draw Path
+      Path path;
+      for (int i=0; i<paths.size(); i++) {
+        path = paths.get(i);
+        path.display(100, 150);
+      }
     }
     
     // Draw People
     for(Person p: people) {
       // Only Draw People Within Bounds
-      if (p.loc.x > - BUFFER && p.loc.x < boundary.x + BUFFER &&
-          p.loc.y > - BUFFER && p.loc.y < boundary.y + BUFFER ) {
+      Fence fen = fences.get(0);
+      if (p.loc.x > fen.x - BUFFER && p.loc.x < fen.x + fen.l + BUFFER &&
+          p.loc.y > fen.y - BUFFER && p.loc.y < fen.y + fen.w + BUFFER ) {
             
         pushMatrix();
         translate(p.loc.x, p.loc.y, p.h/2);
@@ -203,16 +353,18 @@ class Field {
         
         // Determine Fade
         float fadeX, fadeY, fadeVal;
-        fadeX = abs(p.loc.x - boundary.x/2) - boundary.x/2;
-        fadeY = abs(p.loc.y - boundary.y/2) - boundary.y/2;
+        fadeX = abs(p.loc.x - fen.x - fen.l/2) - fen.l/2;
+        fadeY = abs(p.loc.y - fen.y - fen.w/2) - fen.w/2;
         fadeVal = 1 - max(fadeX, fadeY) / BUFFER;
         
         // Apply Fade, Color, and Draw Person
+        noStroke();
         if (fadeVal > 0) {
           fill(col, fadeVal*255);
         } else {
           fill(col);
         }
+        //if (!p.pathFinding) fill(#FF0000);
         box(scale*p.l, scale*p.w, scale*p.h);
         
         popMatrix();
@@ -222,6 +374,7 @@ class Field {
     float beaconFade = sq(1 - float(frameCounter) / PING_FREQ);
     
     // Draw Beacon Min Range
+    hint(DISABLE_DEPTH_TEST);
     for(Sensor s: beacons) {
       pushMatrix();
       translate(s.loc.x, s.loc.y, -5);
@@ -235,7 +388,6 @@ class Field {
     
     // Draw Beacon Max Range
     if (beaconFade > 0.1) {
-      hint(DISABLE_DEPTH_TEST);
       for(Sensor s: beacons) {
         pushMatrix();
         translate(s.loc.x, s.loc.y, 0);
@@ -259,15 +411,18 @@ class Field {
   }
 }
 
-class Person {
+class Person extends Agent {
   PVector loc, vel, acc;
   float l, w, h; // length, width, and height
   float MAX_SPEED = 15.0; // pixels per second
   color col;
   boolean detected = false;
-  int numDetects = 0;
+  int numDetects;
   
-  Person() {
+  boolean pathFinding = true;
+  
+  Person(float x, float y, float max_speed, ArrayList<PVector> waypoints) {
+    super(x, y, 5, max_speed, waypoints);
     loc = new PVector(0, 0);
     vel = new PVector(0, 0);
     acc = new PVector(0, 0);
@@ -276,32 +431,57 @@ class Person {
     h = 6;
     MAX_SPEED /= 60.0; // convert from seconds to frames
     col = color(255);
+    
+    if (freezeVisitCounter) {
+      numDetects = 1;
+    } else {
+      numDetects = 0;
+    }
   }
   
-  void randomize(float x_max, float y_max) {
-    loc.x = random(0, x_max);
-    loc.y = random(0, y_max);
+  void randomize(float x, float y, float l, float w) {
+    loc.x = random(x, x+l);
+    loc.y = random(y, y+w);
     col = color(random(50, 100), 255, 255, 200);
   }
   
   void update(Field f) {
-    //acc = new PVector(random(-1, 1), random(-1, 1));
-    //acc.setMag(random(-0.1, 0.1));
-    acc.x += random(-1, 1);
-    acc.y += random(-1, 1);
-    vel.add(acc);
-    if (vel.mag() > MAX_SPEED) vel.setMag(MAX_SPEED);
-    loc.add(vel);
     
-    if (loc.x < - f.BUFFER) 
-      loc.x = f.boundary.x + f.BUFFER;
-    if (loc.x > f.boundary.x + f.BUFFER) 
-      loc.x = - f.BUFFER;
-    if (loc.y < -f.BUFFER) 
-      loc.y = f.boundary.y + f.BUFFER;
-    if (loc.y > f.boundary.y + f.BUFFER) 
-      loc.y = - f.BUFFER;
+    //  Default Wandering Behavior
+    //
+    if (!pathFinding) {
+      //  Accelerate in Random Direction
+      //
+      acc.x += random(-1, 1);
+      acc.y += random(-1, 1);
+      vel.add(acc);
+      if (vel.mag() > MAX_SPEED) vel.setMag(MAX_SPEED);
+      loc.add(vel);
+      
+      //  Agents that wander off of their border teleport to opposite border
+      //
+      Fence fen = f.fences.get(1);
+      if (loc.x < fen.x - f.BUFFER) 
+        loc.x = fen.x + fen.l + f.BUFFER;
+      if (loc.x > fen.x + fen.l + f.BUFFER) 
+        loc.x = fen.x - f.BUFFER;
+      if (loc.y < fen.y - f.BUFFER) 
+        loc.y = fen.y + fen.w + f.BUFFER;
+      if (loc.y > fen.y + fen.w + f.BUFFER) 
+        loc.y = fen.y - f.BUFFER;  
+    } else {
+      loc.x = location.x;
+      loc.y = location.y;
+    }
   }
+}
+
+ArrayList<PVector> personLocations(ArrayList<Person> people) {
+  ArrayList<PVector> l = new ArrayList<PVector>();
+  for (Person p: people) {
+    l.add(p.location);
+  }
+  return l;
 }
 
 class Sensor {
@@ -391,5 +571,17 @@ class Block {
     loc.x = random(d_max/2, x_max - d_max/2);
     loc.y = random(d_max/2, y_max - d_max/2);
     col = color(random(100, 200), 255, 255);
+  }
+}
+
+// Specifies a boundary condition for People Agents
+class Fence {
+  float x, y, l, w;
+  
+  Fence(float x, float y, float l, float w) {
+    this.x = x;
+    this.y = y;
+    this.l = l;
+    this.w = w;
   }
 }
