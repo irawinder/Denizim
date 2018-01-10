@@ -432,6 +432,7 @@ class Field {
       fieldY = constrain(fieldY, 0, boundary.y);
       translate(fieldX, fieldY, 10);
       fill(255);
+      noStroke();
       sphere(5);
       popMatrix();
     }
