@@ -8,9 +8,10 @@
 
 String version = "Beta 1.3";
 
-String project = "Soofa Spaces Simulator, " + version + "\n" + "Changing Environments\n\n";
-
-String description = "Soofa sensors can collect anonymized " +
+//String company = "Soofa ";
+String company = "";
+String project = company + "Places Simulator, " + version + "\n" + "Ira Winder\n\n";
+String description = company + "Sensors can collect anonymized " +
                      "data to help cities understand visitor behavior. " +
                      "This simulator shows how they collect data from a " +
                      "population.";
@@ -151,7 +152,11 @@ void draw2D() {
   translate(0, height - 2*MARGIN*height);
   textAlign(CENTER, BOTTOM);
   fill(lnColor, 2*baseAlpha);
-  text("Copyright 2018 Ira Winder and Changing Environments", 0, 0);
+  String credit = "";
+  if ( !company.equals("") ){
+    credit += " and " + company;
+  }
+  text("Copyright 2018 Ira Winder" + credit, 0, 0);
   popMatrix();
   
   
@@ -163,13 +168,18 @@ void draw2D() {
   fill(lnColor, 1*baseAlpha);
   rect( 0, 0, 230, 800 - 48, 10);
   
-  // Draw Logo (1500 x 719)
+  //// Draw Logo (1500 x 719)
   translate(20, 5);
   tint(255, 255);
-  image(logo, 0, 10, 0.1*1500, 0.1*719);
+  if (company.equals("Soofa ")) {
+    image(logo, 0, 10, 0.1*1500, 0.1*719);
   
-  // Draw Description
-  translate(0, 0.15*719);
+  
+    // Draw Description
+    translate(0, 0.15*719);
+  } else {
+    translate(0, 20);
+  }
   fill(lnColor);
   textAlign(LEFT, TOP);
   text(project + description + "\n\nLegend:", 0, 0, 200, 0.9*height);
@@ -220,14 +230,14 @@ void draw2D() {
   if (f.showPaths) {
     pathText += "\n\n  Origin\n\n - Shortest Path\n\n  Destination";
   }
-  text("Undetected Visitor\n\nNew Visitor\n\nReturning Visitor\n\n  Soofa Sensor" + pathText, 10, -1);
+  text("Undetected Visitor\n\nNew Visitor\n\nReturning Visitor\n\n  " + company + "Sensor" + pathText, 10, -1);
   popMatrix();
   
   //DrawDirections
   pushMatrix();
   translate(width - height*MARGIN - 275, height*MARGIN);
   fill(lnColor, (255-baseAlpha)*uiFade);
-  text("Directions:\n\n1. Use scrollbars and mouse to zoom, pan, and rotate.\n\n2. Press '1-5' to randomly generate one to five Soofa sensors, respectively.\n\n3. Press '0' to delete all Soofa Sensors.\n\n4. Click any location to add a Soofa Sensor.\n\n" +
+  text("Directions:\n\n1. Use scrollbars and mouse to zoom, pan, and rotate.\n\n2. Press '1-5' to randomly generate one to five " + company + "sensors, respectively.\n\n3. Press '0' to delete all " + company + "Sensors.\n\n4. Click any location to add a " + company + "Sensor.\n\n" +
        "5. Press ' m ' to toggle map\n\n6. Press ' p ' to reset population\n\n7. Press ' i ' to invert colors", 0, 0, 200, 400);
   popMatrix();
   

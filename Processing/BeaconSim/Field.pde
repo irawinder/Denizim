@@ -314,7 +314,7 @@ class Field {
           //col = p.col;
           vis = min(1, p.numDetects-1) / 1.0;
           col = color(150 - 50*vis, 255, 255);
-          scale = 1.5;
+          scale = 1.0;
         } else {
           col = color(255, 2*baseAlpha);
           scale = 1.0;
