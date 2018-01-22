@@ -8,9 +8,9 @@
 
 String version = "Beta 1.3";
 
-String company = "Soofa ";
-//String company = "";
-String project = company + "Places Simulator, " + version + "\n" + "Ira Winder\n\n";
+//String company = "Soofa ";
+String company = "";
+String project = company + "Denizim, " + version + "\n" + "Ira Winder\n\n";
 String description = company + "Sensors can collect anonymized " +
                      "data to help cities understand visitor behavior. " +
                      "This simulator shows how they collect data from a " +
