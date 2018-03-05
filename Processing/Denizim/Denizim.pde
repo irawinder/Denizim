@@ -10,7 +10,7 @@ String version = "Beta 1.3";
 
 //String company = "Soofa ";
 String company = "";
-String project = company + "Denizim Beacon Simulator\n" + version + "\nIra Winder\n\n";
+String project = company + "Denizim:\nBeacon Simulator " + version + "\nIra Winder\n\n";
 String description = company + "Sensors can collect anonymized " +
                      "data to help cities understand visitor behavior. " +
                      "This simulator shows how they collect data from a " +
