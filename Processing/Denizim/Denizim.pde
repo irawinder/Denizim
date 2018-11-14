@@ -199,6 +199,8 @@ void draw2D() {
   text("Copyright 2018 Ira Winder" + credit, 0, 0);
   popMatrix();
   
+  image(logo_C1, 50, height - 150, 200, 100);
+  
   /*
   pushMatrix();
   // Draw Help Canvas

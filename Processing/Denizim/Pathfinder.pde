@@ -270,9 +270,9 @@ class Path {
     // Draw Origin (Yellow) and Destination (Blue)
     //
     strokeWeight(2);
-    stroke(#FFFF00, 4*alpha); // Yellow
+    stroke(#d03027, 4*alpha); // Red
     ellipse(origin.x, origin.y, diameter, diameter);
-    stroke(#0000FF, 4*alpha); // Blue
+    stroke(#004977, 4*alpha); // Blue
     ellipse(destination.x, destination.y, diameter, diameter);
     
     strokeWeight(1);

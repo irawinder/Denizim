@@ -299,6 +299,7 @@ class Field {
     */
     
     // Draw People
+    
     for(Person p: people) {
       // Only Draw People Within Bounds
       Fence fen = fences.get(0);
@@ -311,16 +312,20 @@ class Field {
         // Determine Color
         float scale;
         color col;
-        float vis;
-        if (p.detected) {
-          //col = p.col;
-          vis = min(1, p.numDetects-1) / 1.0;
-          col = color(150 - 50*vis, 255, 255);
-          scale = 1.0;
-        } else {
-          col = color(255, 2*baseAlpha);
-          scale = 1.0;
-        }
+//        float vis;
+//        if (p.detected) {
+//          //col = p.col;
+//          vis = min(1, p.numDetects-1) / 1.0;
+//          col = color(150 - 50*vis, 255, 255);
+//          scale = 1.0;
+//        } else {
+//          col = color(255, 2*baseAlpha);
+//          scale = 1.0;
+//        }
+
+//        col = lerpColor(#d03027, #004977, 0.5);
+        col = color(#009cff);
+        scale = 1.0;
         
         // Determine Fade
         float fadeX, fadeY, fadeVal;
@@ -391,6 +396,7 @@ class Field {
       }
     }
     
+    /*
     float beaconFade = sq(1 - float(frameCounter) / PING_FREQ);
     
     // Draw Beacon Min Range
@@ -424,6 +430,7 @@ class Field {
       }
       hint(ENABLE_DEPTH_TEST);
     }
+    */
     
     // Draw Cursor
     if (!mousePressed) {
