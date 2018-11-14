@@ -38,3 +38,5 @@ void invertColors() {
   bgColor = abs(lnColor - 255);
   inverted = !inverted;
 }
+
+boolean play = false;

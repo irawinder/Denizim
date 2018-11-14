@@ -99,7 +99,7 @@ void draw() {
   for (Person p: f.people) {
     p.update(personLocations(f.people), true);
     p.update(f);
-    
+    /*
     if (frameCounter == 0) { // Ping Sensors
       if (!p.detected) {
         for (Sensor s: f.beacons) {
@@ -117,8 +117,9 @@ void draw() {
         if (!check) p.detected = false;
       }
     }
+    */
   }
-  
+  /*
   if (frameCounter == 0) {
     // Update Visitor Summary Info
     Float[] reading = new Float[3];
@@ -137,6 +138,7 @@ void draw() {
     visitors.addReading(reading);
     visitors.updateMax(f.people.size());
   }
+  */
   
   // Draw 3D Graphics
   draw3D(f);
@@ -162,6 +164,11 @@ void draw() {
     f.randomizePeople();
   }
   
+  if (play) {
+    vs.play();
+    hs.play();
+  }
+  
 }
 
 void draw2D() {
@@ -181,7 +188,7 @@ void draw2D() {
   translate(width/2, MARGIN*height);
   fill(lnColor, 255-baseAlpha);
   textAlign(CENTER, TOP);
-  text("Press 'r' to reset camera position", 0, 0);
+  text("Press 'r' to reset camera position\nPress 'p' to autoplay", 0, 0);
   translate(0, height - 2*MARGIN*height);
   textAlign(CENTER, BOTTOM);
   fill(lnColor, 2*baseAlpha);
@@ -192,7 +199,7 @@ void draw2D() {
   text("Copyright 2018 Ira Winder" + credit, 0, 0);
   popMatrix();
   
-  
+  /*
   pushMatrix();
   // Draw Help Canvas
   translate(MARGIN*height, MARGIN*height);
@@ -271,10 +278,10 @@ void draw2D() {
   translate(width - height*MARGIN - 275, height*MARGIN);
   fill(lnColor, (255-baseAlpha)*uiFade);
   text("Directions:\n\n1. Use scrollbars and mouse to zoom, pan, and rotate.", 0, 0, 200, 400);
-  /*
-  \n\n2. Press '1-5' to randomly generate one to five " + company + "sensors, respectively.\n\n3. Press '0' to delete all " + company + "Sensors.\n\n4. Click any location to add a " + company + "Sensor.\n\n" +
-       "5. Press ' m ' to toggle map\n\n6. Press ' p ' to reset population\n\n7. Press ' i ' to invert colors", 0, 0, 200, 400);
-       */
+
+  //\n\n2. Press '1-5' to randomly generate one to five " + company + "sensors, respectively.\n\n3. Press '0' to delete all " + company + "Sensors.\n\n4. Click any location to add a " + company + "Sensor.\n\n" +
+  //     "5. Press ' m ' to toggle map\n\n6. Press ' p ' to reset population\n\n7. Press ' i ' to invert colors", 0, 0, 200, 400);
+
   popMatrix();
   
   //Draw Summary
@@ -292,6 +299,7 @@ void draw2D() {
        "Repeat Visits: " + int(1000*reading[2]/reading[1])/10.0 + "%\n\n" +
        "Location:\nMills Park, Oak Park, IL", 0, 180);
   popMatrix();
+  */
   
   hint(ENABLE_DEPTH_TEST);
 }

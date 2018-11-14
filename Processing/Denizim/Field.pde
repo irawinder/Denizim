@@ -62,7 +62,7 @@ class Field {
     int graphWidth = int(boundary.x);   // pixels
     int graphHeight = int(boundary.y); // pixels
     network = new Graph(graphWidth, graphHeight, nodeResolution);
-    network.cullRandom(0.0); // Randomly eliminates 0% of the nodes in the network
+    network.cullRandom(0.0); // Randomly eliminates 10% of the nodes in the network
     network.applyObstacleCourse(course);
     
     // An example pathfinder object used to derive the shortest path
@@ -286,6 +286,7 @@ class Field {
       lights();
     }
     
+    /*
     // Draw Beacons
     for(Sensor s: beacons) {
       pushMatrix();
@@ -295,6 +296,7 @@ class Field {
       sphere(s.DIAM);
       popMatrix();
     }
+    */
     
     // Draw People
     for(Person p: people) {

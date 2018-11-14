@@ -135,6 +135,21 @@ class HScrollbar {
     // 0 and 2PI
     return 2 * PI * (spos-sposMin) / (swidth-sheight);
   }
+  
+  int iter = -1;
+  void play() {
+    if (iter < 0) {
+      newspos -= 0.2;
+      if (newspos < sposMin) {
+        iter = 1;
+      }
+    } else {
+      newspos += 0.2;
+      if (newspos > sposMax) {
+        iter = -1;
+      }
+    }
+  }
 }
 
 class VScrollbar {
@@ -219,6 +234,21 @@ class VScrollbar {
     // Convert spos to be values between
     // 0 and 2PI
     return MIN_ZOOM + (MAX_ZOOM - MIN_ZOOM) * spos / float(sheight);
+  }
+  
+  int iter = -1;
+  void play() {
+    if (iter < 0) {
+      newspos -= 0.2;
+      if (newspos < sposMin) {
+        iter = 1;
+      }
+    } else {
+      newspos += 0.2;
+      if (newspos > sposMax) {
+        iter = -1;
+      }
+    }
   }
 }
 
@@ -462,9 +492,9 @@ void keyPressed() {
       fadeTimer = FADE_TIMER;
       resetControls();
       break;
-    case 'p':
-      f.randomizePeople();
-      break;
+    //case 'p':
+    //  f.randomizePeople();
+    //  break;
     //case 'i':
     //  initFields();
     //  break;
@@ -488,6 +518,9 @@ void keyPressed() {
       break;
     case '`': 
       toggle2DProjection();
+      break;
+    case 'p':
+      play = !play;
       break;
   }
 }
