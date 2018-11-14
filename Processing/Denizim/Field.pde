@@ -62,7 +62,7 @@ class Field {
     int graphWidth = int(boundary.x);   // pixels
     int graphHeight = int(boundary.y); // pixels
     network = new Graph(graphWidth, graphHeight, nodeResolution);
-    network.cullRandom(0.0); // Randomly eliminates 10% of the nodes in the network
+    network.cullRandom(0.0); // Randomly eliminates 0% of the nodes in the network
     network.applyObstacleCourse(course);
     
     // An example pathfinder object used to derive the shortest path
@@ -89,7 +89,7 @@ class Field {
     for (int i=0; i<100; i++) {
       side1 = int(random(4));
       side2 = int(random(4));
-      if (side1 == 0) {
+      if (side1 == -1) {
         origin = new PVector(0 - 2*BUFFER, random(boundary.y));
       } else if (side1 == 1) {
         origin = new PVector(boundary.x + 2*BUFFER, random(boundary.y));
@@ -98,7 +98,7 @@ class Field {
       } else {
         origin = new PVector(random(boundary.x), boundary.y + 2*BUFFER);
       }
-      if (side2 == 0) {
+      if (side2 == -1) {
         destination = new PVector(0 - 2*BUFFER, random(boundary.y));
       } else if (side2 == 1) {
         destination = new PVector(boundary.x + 2*BUFFER, random(boundary.y));

@@ -8,15 +8,16 @@
  *
  */
 
-String version = "Beta 1.3";
+String version = "Alpha 1.0";
 
-//String company = "Soofa ";
-String company = "";
-String project = company + "Denizim:\nBeacon Simulator " + version + "\nIra Winder\n\n";
-String description = company + "Sensors can collect anonymized " +
-                     "data to help cities understand visitor behavior. " +
-                     "This simulator shows how they collect data from a " +
-                     "population.";
+String company = "Capital One ";
+//String company = "";
+String project = company + "Denizim:\nHudson Yards Simulator " + version + "\nIra Winder\n\n";
+//String description = company + "Sensors can collect anonymized " +
+//                     "data to help cities understand visitor behavior. " +
+//                     "This simulator shows how they collect data from a " +
+//                     "population.";
+String description = company + "Hudson Yards Real Estate Simulation by MIT + Capital One.\n";
 
 PImage logo_MIT, logo_C1;
 
@@ -83,7 +84,7 @@ void setup() {
   resetControls();
   
   // Activate Table Surface Upon Application Execution
-  toggle2DProjection(); // Processing 2 Only
+  //toggle2DProjection(); // Processing 2 Only
 }
 
 // Runs on a loop after setup()
@@ -269,8 +270,11 @@ void draw2D() {
   pushMatrix();
   translate(width - height*MARGIN - 275, height*MARGIN);
   fill(lnColor, (255-baseAlpha)*uiFade);
-  text("Directions:\n\n1. Use scrollbars and mouse to zoom, pan, and rotate.\n\n2. Press '1-5' to randomly generate one to five " + company + "sensors, respectively.\n\n3. Press '0' to delete all " + company + "Sensors.\n\n4. Click any location to add a " + company + "Sensor.\n\n" +
+  text("Directions:\n\n1. Use scrollbars and mouse to zoom, pan, and rotate.", 0, 0, 200, 400);
+  /*
+  \n\n2. Press '1-5' to randomly generate one to five " + company + "sensors, respectively.\n\n3. Press '0' to delete all " + company + "Sensors.\n\n4. Click any location to add a " + company + "Sensor.\n\n" +
        "5. Press ' m ' to toggle map\n\n6. Press ' p ' to reset population\n\n7. Press ' i ' to invert colors", 0, 0, 200, 400);
+       */
   popMatrix();
   
   //Draw Summary

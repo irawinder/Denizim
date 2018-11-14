@@ -15,8 +15,8 @@ void initFields() {
   PImage img;
   
   // Mills Park (PaganFest)
-  img = loadImage("0/millspark_1000ft.png");
-  f = new Field(1000, 1000, 50, img); // (ft, ft, ft)
+  img = loadImage("0/hudson_yards.jpg");
+  f = new Field(1200, 675, 50, img); // (ft, ft, ft)
   city.add(f);
   
   // Las Cruces

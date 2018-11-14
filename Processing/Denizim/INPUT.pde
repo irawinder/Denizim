@@ -396,6 +396,24 @@ void keyPressed() {
         case '6':
           b.h += 2;
           break;
+        case '!':
+          b.l -= 20;
+          break;
+        case '@':
+          b.l += 20;
+          break;
+        case '#':
+          b.w -= 20;
+          break;
+        case '$':
+          b.w += 20;
+          break;
+        case '%':
+          b.h -= 20;
+          break;
+        case '^':
+          b.h += 20;
+          break;
       }
       
       if (key == CODED) { 
@@ -454,14 +472,14 @@ void keyPressed() {
       drawMap = !drawMap;
       f.showPaths = !f.showPaths;
       break;
-    //case 'B':
-    //  f.blockEditing = !f.blockEditing;
-    //  println("Editing Blocks: " + f.blockEditing);
-    //  break;
-    //case 'F':
-    //  f.fenceEditing = !f.fenceEditing;
-    //  println("Editing Fences: " + f.fenceEditing);
-    //  break;
+    case 'B':
+      f.blockEditing = !f.blockEditing;
+      println("Editing Blocks: " + f.blockEditing);
+      break;
+    case 'F':
+      f.fenceEditing = !f.fenceEditing;
+      println("Editing Fences: " + f.fenceEditing);
+      break;
     //case 'f':
     //  f.showPaths = !f.showPaths;
     //  break;
@@ -477,7 +495,7 @@ void keyPressed() {
 // resets and centers camera view
 void resetControls() {
   hs.newspos = hs.xpos + hs.swidth/2 - hs.sheight/2;
-  vs.newspos = vs.sposMin + 0.1*vs.sheight;
+  vs.newspos = vs.sposMin + 0.2*vs.sheight;
   drag.x_offset = 0;
   drag.y_offset = 0;
   drag.camX_init = CAMX_DEFAULT;
