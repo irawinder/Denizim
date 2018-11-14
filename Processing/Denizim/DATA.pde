@@ -1,3 +1,23 @@
+Table dev;
+
+void initDevelopment() {
+  dev = loadTable("0/development.csv", "header");
+}
+
+// 0 = 2018
+// 1 = 2019
+// 2 = 2020
+// 3 = 2022
+int yearIndex = 0;
+
+void nextYear() {
+  if (yearIndex == 3) {
+    year = 0;
+  } else {
+    year++;
+  }
+}
+
 // Classes that contains our urban sensor simulation
 ArrayList<Field> city;
 int cityIndex = 0;

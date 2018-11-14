@@ -522,6 +522,9 @@ void keyPressed() {
     case 'p':
       play = !play;
       break;
+    case 'b':
+      nextYear();
+      break;
   }
 }
 

@@ -85,6 +85,9 @@ void setup() {
   
   // Activate Table Surface Upon Application Execution
   //toggle2DProjection(); // Processing 2 Only
+  
+  // Development Table
+  initDevelopment();
 }
 
 // Runs on a loop after setup()
