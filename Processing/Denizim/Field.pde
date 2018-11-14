@@ -3,6 +3,8 @@
  *  and Sensor classes, among others.
  */
 
+float[] grow = {0.0, 0.0, 0.0, 0.0, 0.0};
+
 class Field {
   // Bounding Box for Our Environment, Used to focus camera
   // Remember that (0,0) is in upper-left corner!
@@ -222,6 +224,8 @@ class Field {
     blockTable.addColumn();
     blockTable.addColumn();
     blockTable.addColumn();
+    blockTable.addColumn();
+    blockTable.addColumn();
     TableRow row;
     for (Block b: blocks) {
       row = blockTable.addRow();
@@ -230,6 +234,8 @@ class Field {
       row.setFloat(2, b.l);
       row.setFloat(3, b.w);
       row.setFloat(4, b.h);
+      row.setInt(5, b.type);
+      row.setInt(6, b.year);
     }
     saveTable(blockTable, "data/" + cityIndex + "/blockTable.tsv");
     println(blocks.size() + " blocks saved.");
@@ -241,6 +247,7 @@ class Field {
     
     blocks.clear();
     float x, y, l, w, h;
+    int year, type;
     Block b;
     for (int i=0; i<blockTable.getRowCount(); i++) {
       x = blockTable.getFloat(i, 0);
@@ -248,7 +255,14 @@ class Field {
       l = blockTable.getFloat(i, 2);
       w = blockTable.getFloat(i, 3);
       h = blockTable.getFloat(i, 4);
+      type = blockTable.getInt(i, 5);
+      year = blockTable.getInt(i, 6);
       b = new Block(x, y, l, w, h);
+      b.type = type;
+      b.year = year;
+      if (b.type >=1 && b.type <= 4) {
+          b.col = USE[b.type-1];
+        }
       blocks.add(b);
     }
     selectedBlock = 0;
@@ -355,17 +369,28 @@ class Field {
       }
     }
     
+    // Update growth curve
+    for (int k=0; k<grow.length; k++) {
+      if ((yearIndex-2018) < k) {
+        grow[k] += (1.0 - grow[k])*0.01;
+      } else {
+        grow[k] = 0;
+      }
+    }
+    
     // Draw Buildings and Streets
     for(int i=0; i<blocks.size(); i++) {
       Block b = blocks.get(i);
       pushMatrix();
-      translate(b.loc.x, b.loc.y, b.h/2);
+      translate(b.loc.x, b.loc.y, grow[b.year-2018]*b.h/2);
       if (b.h > 0) {
         noStroke();
         if (i == selectedBlock && blockEditing) {
-          fill(#FFFF00, 2*baseAlpha);
+          fill(#FFFF00, 3*baseAlpha);
+          stroke(255);
         } else {
-          fill(b.col, 2*baseAlpha);
+          fill(b.col, 3*baseAlpha);
+          stroke(255);
         }
       } else {
         noFill();
@@ -375,9 +400,12 @@ class Field {
           stroke(b.col, 2*baseAlpha);
         }
       }
-      if (blockEditing || b.h > 0 ) {
+      if (blockEditing) {
         box(b.l, b.w, b.h);
+      } else if (b.h > 0 && (b.year-2018) <= yearIndex) {
+        box(b.l, b.w, grow[b.year-2018]*b.h);
       }
+      
       fill(255);
       noStroke();
       popMatrix();
@@ -587,6 +615,8 @@ class Block {
   PVector loc;
   float l, w, h; // length, width, and height
   color col;
+  int type;
+  int year;
   
   Block() {
     loc = new PVector(0, 0);
@@ -594,6 +624,8 @@ class Block {
     w = 0;
     h = 0;
     col = color(255);
+    type = 0;
+    year = 2018;
   }
   
   Block(float x, float y, float l, float w, float h) {

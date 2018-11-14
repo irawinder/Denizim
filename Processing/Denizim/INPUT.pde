@@ -5,7 +5,7 @@
 int activeInput = -1;
 
 void updateInputs() {
-  
+
   // Fade input controls when not in use
   if (mousePressed) {
     uiFade = 1.0;
@@ -21,7 +21,7 @@ void updateInputs() {
       }
     }
   }
-  
+
   // Update All Scroll and Drag Inputs
   if (!mousePressed) {
     if (drag.updating()) {
@@ -33,19 +33,19 @@ void updateInputs() {
     camRotation = hs.getPosPI();
     vs.update();
     camZoom = vs.getPosZoom();
-    
-  // Update Drag Only
+
+    // Update Drag Only
   } else if (activeInput == 0) {
     drag.update();
     camOffset.x = drag.getX();
     camOffset.y = drag.getY();
-    
-  // Update Horizontal Scroll Bar Only
+
+    // Update Horizontal Scroll Bar Only
   } else if (activeInput == 1) {
     hs.update();
     camRotation = hs.getPosPI();
-    
-  // Update Vertical Scroll Bar Only
+
+    // Update Vertical Scroll Bar Only
   } else if (activeInput == 2) {
     vs.update();
     camZoom = vs.getPosZoom();
@@ -102,7 +102,7 @@ class HScrollbar {
 
   boolean overEvent() {
     if (mouseX > xpos && mouseX < xpos+swidth &&
-       mouseY > ypos && mouseY < ypos+sheight) {
+      mouseY > ypos && mouseY < ypos+sheight) {
       return true;
     } else {
       return false;
@@ -129,13 +129,13 @@ class HScrollbar {
     // 0 and the total width of the scrollbar
     return spos * ratio;
   }
-  
+
   float getPosPI() {
     // Convert spos to be values between
     // 0 and 2PI
     return 2 * PI * (spos-sposMin) / (swidth-sheight);
   }
-  
+
   int iter = -1;
   void play() {
     if (iter < 0) {
@@ -202,7 +202,7 @@ class VScrollbar {
 
   boolean overEvent() {
     if (mouseX > xpos && mouseX < xpos+swidth &&
-       mouseY > ypos && mouseY < ypos+sheight) {
+      mouseY > ypos && mouseY < ypos+sheight) {
       return true;
     } else {
       return false;
@@ -229,13 +229,13 @@ class VScrollbar {
     // 0 and the total width of the scrollbar
     return spos * ratio;
   }
-  
+
   float getPosZoom() {
     // Convert spos to be values between
     // 0 and 2PI
     return MIN_ZOOM + (MAX_ZOOM - MIN_ZOOM) * spos / float(sheight);
   }
-  
+
   int iter = -1;
   void play() {
     if (iter < 0) {
@@ -255,43 +255,43 @@ class VScrollbar {
 class XYDrag {
   float scaler;
   float loose;
-  
+
   float x_init;
   float y_init;
   float x_offset;
   float y_offset;
   float x_smooth;
   float y_smooth;
-  
+
   float x, y;
-  
+
   float camX_init;
   float camY_init;
-  
+
   // Extent of Clickability
   int extentX;
   int extentY;
   int extentW;
   int extentH;
-  
+
   XYDrag(float s, float l, int eX, int eY, int eW, int eH ) {
     scaler = s;
     loose = l;
-    
+
     extentX = eX;
     extentY = eY;
     extentW = eW;
     extentH = eH;
   }
-  
+
   boolean inExtents() {
     if (mouseX > extentX && mouseX < extentX+extentW && mouseY > extentY && mouseY < extentY+extentH) {
-      return true; 
+      return true;
     } else {
       return false;
     }
   }
-  
+
   void init() {
     x_init = mouseX;
     y_init = mouseY;
@@ -300,7 +300,7 @@ class XYDrag {
     x_smooth = 0;
     y_smooth = 0;
   }
-  
+
   void update() {
     if (mousePressed) {
       x_offset = - (mouseX - x_init);
@@ -315,7 +315,7 @@ class XYDrag {
     x = scaler*x_smooth;
     y = scaler*y_smooth;
   }
-  
+
   boolean updating() {
     if (abs(x_smooth - x_offset) > 1 || abs(y_smooth - y_offset) > 1) {
       return true;
@@ -323,22 +323,22 @@ class XYDrag {
       return false;
     }
   }
-  
+
   // Coordinate Rotation Transformation:
   // x' =   x*cos(theta) + y*sin(theta)
   // y' = - x*sin(theta) + y*cos(theta)
-  
+
   float getX() {
     return camX_init + x*cos(camRotation) + y*sin(camRotation);
   }
-  
+
   float getY() {
     return camY_init - x*sin(camRotation) + y*cos(camRotation);
   }
 }
 
 void mousePressed() {
-  
+
   // Determine which output is active
   if (hs.overEvent()) {
     activeInput = 1;
@@ -358,7 +358,7 @@ void mouseClicked() {
   float fieldY = f.boundary.y*(mouseY - 0.15*height)/(0.7*height);
   fieldX = constrain(fieldX, 0, f.boundary.x);
   fieldY = constrain(fieldY, 0, f.boundary.y);
-  
+
   if (f.blockEditing) {
     Block b;
     b = new Block(fieldX, fieldY, 50, 50, 0);
@@ -380,78 +380,97 @@ void mouseMoved() {
 void keyPressed() {
   uiFade = 1.0;
   fadeTimer = FADE_TIMER;
-  
+
   Field f = city.get(cityIndex);
-  
+
   if (f.blockEditing) {
     switch(key) {
-      case 'S':
-        f.saveBlocks();
-        break;
-      case 'L':
-        f.loadBlocks(cityIndex + "/" +"blockTable.tsv");
-        break;
+    case 'S':
+      f.saveBlocks();
+      break;
+    case 'L':
+      f.loadBlocks(cityIndex + "/" +"blockTable.tsv");
+      break;
     }
-    
+
     if (f.blocks.size() > 0) {
       Block b = f.blocks.get(f.selectedBlock);
       switch(key) {
-        case ']':
-          f.nextBlock();
-          break;
-        case '[':
-          f.lastBlock();
-          break;
-        case 'd':
-          f.removeBlock();
-          break;
-        case 'b':
-          f.randomizeBlocks();
-          break;
-        case '1':
-          b.l -= 2;
-          break;
-        case '2':
-          b.l += 2;
-          break;
-        case '3':
-          b.w -= 2;
-          break;
-        case '4':
-          b.w += 2;
-          break;
-        case '5':
-          b.h -= 2;
-          break;
-        case '6':
-          b.h += 2;
-          break;
-        case '!':
-          b.l -= 20;
-          break;
-        case '@':
-          b.l += 20;
-          break;
-        case '#':
-          b.w -= 20;
-          break;
-        case '$':
-          b.w += 20;
-          break;
-        case '%':
-          b.h -= 20;
-          break;
-        case '^':
-          b.h += 20;
-          break;
+      case ']':
+        f.nextBlock();
+        break;
+      case '[':
+        f.lastBlock();
+        break;
+      case 'd':
+        f.removeBlock();
+        break;
+      case 'b':
+        f.randomizeBlocks();
+        break;
+      case '1':
+        b.l -= 2;
+        break;
+      case '2':
+        b.l += 2;
+        break;
+      case '3':
+        b.w -= 2;
+        break;
+      case '4':
+        b.w += 2;
+        break;
+      case '5':
+        b.h -= 2;
+        break;
+      case '6':
+        b.h += 2;
+        break;
+      case '!':
+        b.l -= 20;
+        break;
+      case '@':
+        b.l += 20;
+        break;
+      case '#':
+        b.w -= 20;
+        break;
+      case '$':
+        b.w += 20;
+        break;
+      case '%':
+        b.h -= 20;
+        break;
+      case '^':
+        b.h += 20;
+        break;
+      case '0':
+        if (b.type < 4) {
+          b.type ++;
+        } else {
+          b.type = 0;
+        }
+        if (b.type >=1 && b.type <= 4) {
+          b.col = USE[b.type-1];
+        }
+        println("Type: " + b.type);
+        break;
+      case 'y':
+        if (b.year < 2022) {
+          b.year++;
+        } else {
+          b.year = 2018;
+        }
+        println("Year: " + b.year);
+        break;
       }
-      
+
       if (key == CODED) { 
         if (keyCode == LEFT) {
-          b.loc.x -= 2; 
+          b.loc.x -= 2;
         }  
         if (keyCode == RIGHT) {
-          b.loc.x += 2; 
+          b.loc.x += 2;
         }  
         if (keyCode == DOWN) {
           b.loc.y -= 2;
@@ -461,70 +480,75 @@ void keyPressed() {
         }
       }
     }
-   
   } else {
-    
+
     switch(key) {
-      case '0':
-        f.randomBeacons(0);
-        break;
-      case '1':
-        f.randomBeacons(1);
-        break;
-      case '2':
-        f.randomBeacons(2);
-        break;
-      case '3':
-        f.randomBeacons(3);
-        break;
-      case '4':
-        f.randomBeacons(4);
-        break;
-      case '5':
-        f.randomBeacons(5);
-        break;
+    case '0':
+      f.randomBeacons(0);
+      break;
+    case '1':
+      f.randomBeacons(1);
+      break;
+    case '2':
+      f.randomBeacons(2);
+      break;
+    case '3':
+      f.randomBeacons(3);
+      break;
+    case '4':
+      f.randomBeacons(4);
+      break;
+    case '5':
+      f.randomBeacons(5);
+      break;
     }
   }
-  
+
   switch(key) {
-    case 'r':
-      uiFade = 1.0;
-      fadeTimer = FADE_TIMER;
-      resetControls();
-      break;
+  case 'r':
+    uiFade = 1.0;
+    fadeTimer = FADE_TIMER;
+    resetControls();
+    break;
     //case 'p':
     //  f.randomizePeople();
     //  break;
     //case 'i':
     //  initFields();
     //  break;
-    case 'm':
-      drawMap = !drawMap;
-      f.showPaths = !f.showPaths;
-      break;
-    case 'B':
-      f.blockEditing = !f.blockEditing;
-      println("Editing Blocks: " + f.blockEditing);
-      break;
-    case 'F':
-      f.fenceEditing = !f.fenceEditing;
-      println("Editing Fences: " + f.fenceEditing);
-      break;
+  case 'm':
+    drawMap = !drawMap;
+    f.showPaths = !f.showPaths;
+    break;
+  case 'B':
+    f.blockEditing = !f.blockEditing;
+    println("Editing Blocks: " + f.blockEditing);
+    break;
+  case 'F':
+    f.fenceEditing = !f.fenceEditing;
+    println("Editing Fences: " + f.fenceEditing);
+    break;
     //case 'f':
     //  f.showPaths = !f.showPaths;
     //  break;
-    case 'i':
-      invertColors();
-      break;
-    case '`': 
-      toggle2DProjection();
-      break;
-    case 'p':
-      play = !play;
-      break;
-    case 'b':
-      nextYear();
-      break;
+  case 'i':
+    invertColors();
+    break;
+  case '`': 
+    toggle2DProjection();
+    break;
+  case 'p':
+    play = !play;
+    break;
+  case 'N':
+    nextYear();
+    println(yearIndex + 2018);
+    if (yearIndex == 0) {
+      for (int i=0; i<grow.length; i++) {
+        grow[i] = 0.0;
+      }
+    }
+    break;
   }
 }
 
@@ -537,3 +561,4 @@ void resetControls() {
   drag.camX_init = CAMX_DEFAULT;
   drag.camY_init = CAMY_DEFAULT;
 }
+

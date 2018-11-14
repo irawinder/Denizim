@@ -7,14 +7,15 @@ void initDevelopment() {
 // 0 = 2018
 // 1 = 2019
 // 2 = 2020
-// 3 = 2022
+// 3 = 2021
+// 4 = 2022
 int yearIndex = 0;
 
 void nextYear() {
-  if (yearIndex == 3) {
-    year = 0;
+  if (yearIndex == 4) {
+    yearIndex = 0;
   } else {
-    year++;
+    yearIndex++;
   }
 }
 
@@ -38,7 +39,6 @@ void initFields() {
   img = loadImage("0/hudson_yards.jpg");
   f = new Field(1200, 675, 50, img); // (ft, ft, ft)
   city.add(f);
-  
   // Las Cruces
   // TBA  
     

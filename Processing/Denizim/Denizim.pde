@@ -31,12 +31,26 @@ XYDrag drag;
 // dimensions of main canvas, in pixes
 int screenWidth, screenHeight;
 
+color[] USE;
+
 void setupDemo() {
   screenWidth = 1280;
   screenHeight = 800;
   projectorWidth = 1920;
   projectorHeight = 1200;
   projectorOffset = 1280;
+  
+  // Use Colors
+  USE = new color[4];
+  // 1 = RESIDENTIAL = #ffcccc;
+  // 2 = OFFICE = #bed9f2;
+  // 3 = RETAIL = #ffcc99;
+  // 4 = INSTITUTIONAL = #ccffff;
+
+  USE[0] = #ff99cc;
+  USE[1] = #bed9f2;
+  USE[2] = #ffcc99;
+  USE[3] = #ccffff;
   
   logo_MIT = loadImage("MIT_logo.png");
   logo_C1 = loadImage("Capital_One_logo.png");
