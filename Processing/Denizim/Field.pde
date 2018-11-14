@@ -11,7 +11,7 @@ class Field {
   PVector boundary;
   
   float BUFFER = 50; // feet
-  float POPULATION = int(random(400, 600));
+  float POPULATION = 50;
   
   // Objects for importing data files such as CSVs and Graphics
   PImage map;

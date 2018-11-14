@@ -19,7 +19,7 @@ TableSurface matrix;
   int U_MAX = 22;
   int V_MAX = 22;
 
-  PImage low_res;
+  PImage low_res, dash;
 
 void setupTable() {
   offscreen = createGraphics(projectorHeight, projectorHeight);
@@ -27,6 +27,7 @@ void setupTable() {
   matrix = new TableSurface(projectorHeight, projectorHeight, V_MAX, V_MAX, true);
   
   low_res = loadImage("0/low_res.png");
+  dash = loadImage("0/dashboard.png");
 }
 
 void renderTable() {
@@ -136,13 +137,11 @@ class TableSurface {
     
     p.fill(255);
     p.textSize(60);
-    p.textAlign(LEFT);
     p.text("Hudson Yards Development Phasing (2018 - 2022)\nPedestrian Impact Analysis", 50, 100);
     
-    p.textSize(80);
-    p.textAlign(RIGHT);
-    p.fill(#FFFF00);
-    p.text("Year: " + (yearIndex+2018), p.width - 50, p.height - 100);
+    p.textSize(100);
+    p.fill(#FFFFCC);
+    p.text("" + (yearIndex+2018), 50, p.height - 300);
     
     Field f = city.get(cityIndex);
     
@@ -162,6 +161,8 @@ class TableSurface {
 //    p.translate(0, 0.5*(p.height - f.map.height));
 //    p.image(f.map, 0, 0);
     
+    canvas_per_map = float(p.width)/f.map.width;
+    
     // Draw People
     p.noStroke();
     for(Person pl: f.people) {
@@ -178,16 +179,29 @@ class TableSurface {
       
       p.fill(col, 100);
       //if (!p.pathFinding) fill(#FF0000);
-      p.ellipse(scale*pl.l, scale*pl.w, scale*10, scale*10);
+      p.ellipse(0, 0, scale*10, scale*10);
       
+      p.popMatrix();
+    }
+    
+    for(int i=0; i<f.blocks.size(); i++) {
+      Block b = f.blocks.get(i);
+      p.pushMatrix();
+      p.translate(canvas_per_map*b.loc.x, canvas_per_map*b.loc.y);
+      if (b.h > 0 && yearIndex >= b.year-2018) {
+        p.noStroke();
+        p.fill(b.col, 200);
+        p.rect(-0.5*canvas_per_map*b.l, -0.5*canvas_per_map*b.w, canvas_per_map*b.l, canvas_per_map*b.w);
+      }
       p.popMatrix();
     }
     
     p.popMatrix();
     
     // Draw logo_C1, logo_MIT
-    p.image(logo_C1, 50, p.height - 200, 200, 100); 
-    //p.image(logo_MIT, 0.5*buffer, 0.87*p.height + 0.5*buffer, 3.0*buffer, 1.4*buffer); 
+    p.image(logo_C1, 50, p.height - 200, 250, 100); 
+    p.image(dash, 500, p.height - 400, 1150, 435);
+    //p.image(logo_MIT, 50, p.height - 400, 250, 100); 
 
     
 

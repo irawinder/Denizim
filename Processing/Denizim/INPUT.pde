@@ -548,7 +548,10 @@ void keyPressed() {
         grow[i] = 0.0;
       }
     }
+    f.POPULATION = int(50 + 500*(yearIndex/4.0));
+    f.randomizePeople();
     break;
+    
   }
 }
 
