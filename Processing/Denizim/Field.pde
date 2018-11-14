@@ -371,7 +371,7 @@ class Field {
     
     // Update growth curve
     for (int k=0; k<grow.length; k++) {
-      if ((yearIndex-2018) < k) {
+      if (yearIndex >= k) {
         grow[k] += (1.0 - grow[k])*0.01;
       } else {
         grow[k] = 0;
