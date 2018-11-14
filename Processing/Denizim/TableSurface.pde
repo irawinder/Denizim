@@ -132,8 +132,11 @@ class TableSurface {
     
     Field f = city.get(cityIndex);
     
-    p.translate(0, 0.5*(p.height - f.map.height));
-    p.image(f.map, 0, 0);
+    float canvas_per_map = float(p.width)/f.map.width;
+    p.image(f.map, 0, 0.5*(p.height - canvas_per_map*f.map.height), p.width, canvas_per_map*f.map.height);
+    
+//    p.translate(0, 0.5*(p.height - f.map.height));
+//    p.image(f.map, 0, 0);
     
     // Draw People
     //p.noStroke();
