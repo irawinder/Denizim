@@ -405,9 +405,9 @@ void keyPressed() {
       case 'd':
         f.removeBlock();
         break;
-      case 'b':
-        f.randomizeBlocks();
-        break;
+//      case 'b':
+//        f.randomizeBlocks();
+//        break;
       case '1':
         b.l -= 2;
         break;
@@ -540,7 +540,7 @@ void keyPressed() {
   case 'p':
     play = !play;
     break;
-  case 'N':
+  case 'b':
     nextYear();
     println(yearIndex + 2018);
     if (yearIndex == 0) {

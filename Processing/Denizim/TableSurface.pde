@@ -133,7 +133,8 @@ class TableSurface {
     Field f = city.get(cityIndex);
     
     float canvas_per_map = float(p.width)/f.map.width;
-    p.image(f.map, 0, 0.5*(p.height - canvas_per_map*f.map.height), p.width, canvas_per_map*f.map.height);
+    p.translate(0, 0.5*(p.height - canvas_per_map*f.map.height));
+    p.image(f.map, 0, 0, p.width, canvas_per_map*f.map.height);
     
 //    p.translate(0, 0.5*(p.height - f.map.height));
 //    p.image(f.map, 0, 0);
@@ -143,7 +144,7 @@ class TableSurface {
     for(Person pl: f.people) {
       // Only Draw People Within Bounds
       p.pushMatrix();
-      p.translate(pl.loc.x, pl.loc.y);
+      p.translate(canvas_per_map*pl.loc.x, canvas_per_map*pl.loc.y);
       
       // Determine Color
       float scale;
