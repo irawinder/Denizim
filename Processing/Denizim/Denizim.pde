@@ -34,11 +34,11 @@ int screenWidth, screenHeight;
 color[] USE;
 
 void setupDemo() {
-  screenWidth = 1280;
-  screenHeight = 800;
-  projectorWidth = 1920;
-  projectorHeight = 1200;
-  projectorOffset = 1280;
+  screenWidth = 1920;
+  screenHeight = 1080;
+  projectorWidth = 1080;
+  projectorHeight = 1920;
+  projectorOffset = 1920;
   
   // Use Colors
   USE = new color[4];
