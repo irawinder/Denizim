@@ -9,7 +9,7 @@ PVector camOffset;
 void initCamera() {
   camRotation = 0; // (0 - 2*PI)
   MAX_ZOOM = 0.1;
-  MIN_ZOOM = 1.0;
+  MIN_ZOOM = 0.8;
   CAMX_DEFAULT = 0;
   CAMY_DEFAULT = - 0.12 * city.get(cityIndex).boundary.y;
   camZoom = 0.2;
