@@ -468,6 +468,9 @@ void keyPressed() {
     case 'i':
       invertColors();
       break;
+    case '`': 
+      toggle2DProjection();
+      break;
   }
 }
 

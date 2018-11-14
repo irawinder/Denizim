@@ -18,6 +18,8 @@ String description = company + "Sensors can collect anonymized " +
                      "This simulator shows how they collect data from a " +
                      "population.";
 
+PImage logo_MIT, logo_C1;
+
 // Scrollbars (horizontal and vertical
 HScrollbar hs;
 VScrollbar vs;
@@ -25,11 +27,33 @@ VScrollbar vs;
 // Drag Functions
 XYDrag drag;
 
+// dimensions of main canvas, in pixes
+int screenWidth, screenHeight;
+
+void setupDemo() {
+  screenWidth = 1280;
+  screenHeight = 800;
+  projectorWidth = 1920;
+  projectorHeight = 1200;
+  projectorOffset = 1280;
+  
+  logo_MIT = loadImage("MIT_logo.png");
+  logo_C1 = loadImage("Capital_One_logo.png");
+}
+
 // Initiatizes program on startup
 void setup() {
 
+  setupDemo();
+  
+  // Initialize Graphics Objects for Drawing Table Surface
+  setupTable();
+  
   // Run application at a specified pixel dimension
-  size(1280, 800, P3D);
+  size(screenWidth, screenHeight, P3D);
+  
+  // Window may be resized after initialized
+  frame.setResizable(true); // Processing 2 Only
   
   // Run application to match native screen resolution
   //fullScreen(P3D); // Only works on PRocessing 3
@@ -57,6 +81,9 @@ void setup() {
   drag = new XYDrag(1.0, 7, 5, 5, width - 10, int(0.85*height) - 5);
   
   resetControls();
+  
+  // Activate Table Surface Upon Application Execution
+  toggle2DProjection(); // Processing 2 Only
 }
 
 // Runs on a loop after setup()
@@ -115,6 +142,9 @@ void draw() {
 
   // Draw 2D Graphics
   draw2D();
+  
+  // Draw Table or Test Projection
+  drawTable();
   
   //Count Frames
   if (frameCounter < PING_FREQ - 1) {
