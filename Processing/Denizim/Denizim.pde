@@ -47,9 +47,6 @@ void setup() {
 
   setupDemo();
   
-  // Initialize Graphics Objects for Drawing Table Surface
-  setupTable();
-  
   // Run application at a specified pixel dimension
   size(screenWidth, screenHeight, P3D);
   
@@ -83,11 +80,15 @@ void setup() {
   
   resetControls();
   
+  // Initialize Graphics Objects for Drawing Table Surface
+  setupTable();
+  
   // Activate Table Surface Upon Application Execution
   //toggle2DProjection(); // Processing 2 Only
 }
 
 // Runs on a loop after setup()
+int frameCnt = 0;
 void draw() {
   background(bgColor);
   
@@ -146,7 +147,15 @@ void draw() {
   // Draw 2D Graphics
   draw2D();
   
-  // Draw Table or Test Projection
+  // Render Table or Test Projection
+  if (frameCnt == 10) {
+    renderTable();
+    frameCnt = 0;
+  } else {
+    frameCnt++;
+  }
+  
+  // Draws an overlay if Mac, otherwise render in projection.pde frame
   drawTable();
   
   //Count Frames

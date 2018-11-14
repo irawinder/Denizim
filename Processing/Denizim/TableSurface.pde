@@ -25,10 +25,12 @@ void setupTable() {
   matrix = new TableSurface(projectorHeight, projectorHeight, V_MAX, V_MAX, true);
 }
 
-void drawTable() {
-
+void renderTable() {
   // Draw the scene, offscreen
   matrix.draw(offscreen);
+}
+
+void drawTable() {
 
   if (testProjectorOnScreen) {
     stroke(0);
@@ -41,8 +43,9 @@ void drawTable() {
     rect( (width - boarderFit*screenFit) / 2, (height - boarderFit*screenFit) / 2, boarderFit*screenFit, boarderFit*screenFit, 10);
     image(offscreen, (width - screenFit) / 2, (height - screenFit) / 2, screenFit, screenFit);
     
-    matrix.mouseToGrid((width - screenFit) / 2, (height - screenFit) / 2, screenFit, screenFit);
+    //matrix.mouseToGrid((width - screenFit) / 2, (height - screenFit) / 2, screenFit, screenFit);
   }
+  
 }
 
 class TableSurface {
@@ -121,10 +124,36 @@ class TableSurface {
       }
     }
     
-    // Draw Mouse-based Cursor for Grid Selection
-    if (gridMouseU != -1 && gridMouseV != -1) {
-      p.fill(255, 150);
-      p.rect(gridMouseU*cellW, gridMouseV*cellH, cellW, cellH);
+//    // Draw Mouse-based Cursor for Grid Selection
+//    if (gridMouseU != -1 && gridMouseV != -1) {
+//      p.fill(255, 150);
+//      p.rect(gridMouseU*cellW, gridMouseV*cellH, cellW, cellH);
+//    }
+    
+    Field f = city.get(cityIndex);
+    
+    p.translate(0, 0.5*(p.height - f.map.height));
+    p.image(f.map, 0, 0);
+    
+    // Draw People
+    //p.noStroke();
+    for(Person pl: f.people) {
+      // Only Draw People Within Bounds
+      p.pushMatrix();
+      p.translate(pl.loc.x, pl.loc.y);
+      
+      // Determine Color
+      float scale;
+      color col;
+
+      col = color(#009cff);
+      scale = 1.0;
+      
+      p.fill(col, 100);
+      //if (!p.pathFinding) fill(#FF0000);
+      p.ellipse(scale*pl.l, scale*pl.w, scale*10, scale*10);
+      
+      p.popMatrix();
     }
     
     // Draw logo_C1, logo_MIT

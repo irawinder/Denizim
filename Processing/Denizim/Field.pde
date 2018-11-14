@@ -107,6 +107,7 @@ class Field {
       } else {
         destination = new PVector(random(boundary.x), boundary.y + 2*BUFFER);
       }
+//      destination = new PVector(random(boundary.x), random(boundary.y));
       p = new Path(origin, destination);
       p.solve(finder);
       paths.add(p);
@@ -388,6 +389,7 @@ class Field {
       image(network.img, 0, 0);
       tint(255, 255);
       
+//      image(pathViz, 0, 0);
       // Draw Path
       Path path;
       for (int i=0; i<paths.size(); i++) {
