@@ -188,7 +188,7 @@ class TableSurface {
       Block b = f.blocks.get(i);
       p.pushMatrix();
       p.translate(canvas_per_map*b.loc.x, canvas_per_map*b.loc.y);
-      if (b.h > 0 && yearIndex >= b.year-2018) {
+      if (b.h > 0 && yearIndex >= b.year-2018 && b.type !=0) {
         p.noStroke();
         p.fill(b.col, 200);
         p.rect(-0.5*canvas_per_map*b.l, -0.5*canvas_per_map*b.w, canvas_per_map*b.l, canvas_per_map*b.w);
@@ -200,7 +200,7 @@ class TableSurface {
     
     // Draw logo_C1, logo_MIT
     p.image(logo_C1, 50, p.height - 200, 250, 100); 
-    p.image(dash, 500, p.height - 400, 1150, 435);
+    p.image(dash, 500, p.height - 400, 1150, 500);
     //p.image(logo_MIT, 50, p.height - 400, 250, 100); 
 
     
