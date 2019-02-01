@@ -23,6 +23,8 @@ VScrollbar vs;
 // Drag Functions
 XYDrag drag;
 
+boolean showUI = true;
+
 // Initiatizes program on startup
 void setup() {
 
@@ -112,7 +114,7 @@ void draw() {
   draw3D(f);
 
   // Draw 2D Graphics
-  draw2D();
+  if (showUI) draw2D();
   
   //Count Frames
   if (frameCounter < PING_FREQ - 1) {
