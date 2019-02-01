@@ -270,10 +270,16 @@ class Field {
     pushMatrix();
     translate(0, 0, -1);
     if (map == null || !drawMap) {
+      
+      // Draw Ground Map
+      tint(255, 150);
+      image(map, 0, 0, boundary.x, boundary.y);
+      tint(255, 255);
+      
       // Draw a Rectangle
-      fill(50, 255 - baseAlpha);
-      noStroke();
-      rect(0, 0, boundary.x, boundary.y);
+      //fill(50, 255 - baseAlpha);
+      //noStroke();
+      //rect(0, 0, boundary.x, boundary.y);
     } else {
       // Draw Ground Map
       tint(255, 225);
