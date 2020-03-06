@@ -29,10 +29,10 @@ boolean showUI = true;
 void setup() {
 
   // Run application at a specified pixel dimension
-  //size(1280, 800, P3D);
+  size(1280, 800, P3D);
   
   // Run application to match native screen resolution
-  fullScreen(P3D);
+  //fullScreen(P3D);
   
   // Sets Color Mode to Hue, Saturation, and Brightness
   colorMode(HSB);
