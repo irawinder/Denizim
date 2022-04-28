@@ -534,9 +534,6 @@ void keyPressed() {
   case 'i':
     invertColors();
     break;
-  case '`': 
-    toggle2DProjection();
-    break;
   case 'p':
     play = !play;
     break;
@@ -564,4 +561,3 @@ void resetControls() {
   drag.camX_init = CAMX_DEFAULT;
   drag.camY_init = CAMY_DEFAULT;
 }
-

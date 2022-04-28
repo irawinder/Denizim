@@ -36,9 +36,6 @@ color[] USE;
 void setupDemo() {
   screenWidth = 1920;
   screenHeight = 1080;
-  projectorWidth = 1080;
-  projectorHeight = 1920;
-  projectorOffset = 1920;
   
   // Use Colors
   USE = new color[4];
@@ -62,10 +59,7 @@ void setup() {
   setupDemo();
   
   // Run application at a specified pixel dimension
-  size(screenWidth, screenHeight, P3D);
-  
-  // Window may be resized after initialized
-  frame.setResizable(true); // Processing 2 Only
+  size(1920, 1080, P3D);
   
   // Run application to match native screen resolution
   //fullScreen(P3D); // Only works on PRocessing 3
@@ -93,9 +87,6 @@ void setup() {
   drag = new XYDrag(1.0, 7, 5, 5, width - 10, int(0.85*height) - 5);
   
   resetControls();
-  
-  // Initialize Graphics Objects for Drawing Table Surface
-  setupTable();
   
   // Activate Table Surface Upon Application Execution
   //toggle2DProjection(); // Processing 2 Only
@@ -166,14 +157,10 @@ void draw() {
   
   // Render Table or Test Projection
   if (frameCnt == 10) {
-    renderTable();
     frameCnt = 0;
   } else {
     frameCnt++;
   }
-  
-  // Draws an overlay if Mac, otherwise render in projection.pde frame
-  drawTable();
   
   //Count Frames
   if (frameCounter < PING_FREQ - 1) {
